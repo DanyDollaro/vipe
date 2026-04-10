@@ -1174,7 +1174,7 @@ struct OpePeView
     char[]                buffer;
     OpeRawDosHeader*      dos;
     OpeNtHeaders          nt;
-    OpeRawSectionHeader[] sections;
+    OpeRawSectionHeader[] section_headers;
 }
 
 //
@@ -1211,7 +1211,7 @@ fn char*? OpePeView._at_size(&self, usz offset, usz size)
 *>
 fn usz? OpePeView.rva_to_offset(&self, uint rva)
 {
-    foreach (s : self.sections)
+    foreach (s : self.section_headers)
     {
         if (rva >= s.virtual_address && rva < s.virtual_address + s.virtual_size)
         {
@@ -1307,7 +1307,7 @@ fn void? OpePeView.init(&self, char[] buffer)
             .fh        = (OpeFileHeader*)fh,
             .oh        = { .raw32 = oh32, .raw64 = oh64 },
         },
-        .sections = sec_ptr[0..sec_count - 1],
+        .section_headers = sec_ptr[0..sec_count - 1],
     };
 }
 
@@ -1336,10 +1336,10 @@ fn OpeOptionalHeader* OpePeView.optional_header(&self) => &self.nt.oh;
  Section names are zero-copy slices into the buffer.
  @require self != null
 *>
-fn OpeSection[] OpePeView.sectionss(&self)
+fn OpeSection[] OpePeView.sections(&self)
 {
-    OpeSection[] result = mem::new_array(OpeSection, self.sections.len);
-    foreach (i, &r : self.sections)
+    OpeSection[] result = mem::new_array(OpeSection, self.section_headers.len);
+    foreach (i, &r : self.section_headers)
     {
         usz name_len = SECTION_NAME_SIZE;
         for (usz j = 0; j < SECTION_NAME_SIZE; j++)

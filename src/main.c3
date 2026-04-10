@@ -17,7 +17,7 @@ fn void main(String[] args) => @pool()
     io::printfn("new image base %s, old %s",
         pe.optional_header().image_base(), old_image_base);
 
-    OpeSection[]? sections = pe.sectionss();
+    OpeSection[]? sections = pe.sections();
     if (try sections)
     {
         foreach (&sec : sections)
