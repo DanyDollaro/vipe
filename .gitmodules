@@ -1,0 +1,3 @@
+[submodule "ope-tests-data"]
+	path = ope-tests-data
+	url = https://github.com/DanyDollaro/ope-tests-data
