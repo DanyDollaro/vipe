@@ -16,7 +16,7 @@ constdef VipeMachineType
 
 struct VipeRawFileHeader @packed
 {
-    ushort machine;
+    VipeMachineType machine;
     ushort number_of_sections;
     uint time_date_stamp;
     uint pointer_to_symbol_table;
@@ -35,9 +35,9 @@ struct VipeViewFileHeader
 }
 
 fn VipeMachineType VipeViewFileHeader.get_machine(&self)
-    => (VipeMachineType)self.raw.machine;
+    => self.raw.machine;
 fn void VipeViewFileHeader.set_machine(&self, VipeMachineType v)
-    => self.raw.machine = (ushort)v;
+    => self.raw.machine = v;
 
 fn ushort VipeViewFileHeader.get_number_of_sections(&self)
     => self.raw.number_of_sections;
