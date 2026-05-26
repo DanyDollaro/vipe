@@ -56,8 +56,14 @@ fn uint VipeViewNtHeaders.get_signature(&self)
     => self.is64 ? self.h64.signature : self.h32.signature;
 fn void VipeViewNtHeaders.set_signature(&self, uint v)
 {
-    if (self.is64) { self.h64.signature = v; }
-    else           { self.h32.signature = v; }
+    if (self.is64)
+    {
+        self.h64.signature = v;
+    }
+    else
+    {
+        self.h32.signature = v;
+    }
 }
 
 fn VipeViewFileHeader VipeViewNtHeaders.file_header(&self)
@@ -82,5 +88,6 @@ fn VipeViewOptionalHeader VipeViewNtHeaders.optional_header(&self)
     {
         optional_header.h32 = &self.h32.optional_header;
     }
+
     return optional_header;
 }
