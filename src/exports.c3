@@ -121,4 +121,4 @@ fn void VipeViewExport.set_forwarder(&self, ZString v)
 // Callbacks
 //
 
-alias VipeExportCallback = fn bool(VipeViewExport*, any);
+alias VipeCallbackExport = fn bool(VipeViewExport*, any);

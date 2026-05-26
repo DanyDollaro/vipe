@@ -103,5 +103,5 @@ fn void VipeViewImport.set_iat_entry_rva(&self, uint v) => self.iat_entry_rva = 
 // View structures definition
 //
 
-alias VipeImportDescriptorCallback = fn bool(VipeViewImportDescriptor*, any);
-alias VipeImportCallback = fn bool(VipeViewImport*, any);
+alias VipeCallbackImportDescriptor = fn bool(VipeViewImportDescriptor*, any);
+alias VipeCallbackImport = fn bool(VipeViewImport*, any);
