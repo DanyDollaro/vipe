@@ -208,12 +208,12 @@ fn void? VipeViewPe.foreach_import_descriptor(&self, VipeImportDescriptorCallbac
 
 struct VipeImportCallbackData @local
 {
-    VipeImportCallback callback;
+    VipeCallbackImport callback;
     VipeViewPe* pe;
     any user_data;
 }
 
-fn void? VipeViewPe.foreach_import(&self, VipeImportCallback callback, any user_data)
+fn void? VipeViewPe.foreach_import(&self, VipeCallbackImport callback, any user_data)
 {
     any data = &&(VipeImportCallbackData){
         .callback  = callback,
@@ -230,348 +230,60 @@ fn void? VipeViewPe.foreach_import(&self, VipeImportCallback callback, any user_
     }, data)!;
 }
 
-fn void? VipeViewPe.foreach_export(&self, VipeExportCallback callback, any user_data)
+fn void? VipeViewPe.foreach_export(&self, VipeCallbackExport callback, any user_data)
 {
 
-    // TODO: refactor this function using VipeViewExportDirectory
 
-    VipeRawDataDirectory*  dir     = self.get_raw_data_directory(VipeDataDirectoryIndex.EXPORT)!;
-    usz                    exp_off = self.rva_to_offset(dir.virtual_address)!;
-    if (exp_off + VipeRawExportDirectory::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-    VipeRawExportDirectory* ed = (VipeRawExportDirectory*)&self.buffer[exp_off];
-    uint export_dir_start = dir.virtual_address;
-    uint export_dir_end   = dir.virtual_address + dir.size;
-    usz  funcs_off = self.rva_to_offset(ed.address_of_functions)!;
-    usz  names_off = self.rva_to_offset(ed.address_of_names)!;
-    usz  ords_off  = self.rva_to_offset(ed.address_of_name_ordinals)!;
-    for (uint i = 0; i < ed.number_of_functions; i++)
-    {
-        if (funcs_off + (usz)(i + 1) * 4 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        uint func_rva = *(uint*)&self.buffer[funcs_off + (usz)i * 4];
-        if (func_rva == 0) continue;
-        VipeViewExport entry;
-        entry.ordinal = (ushort)(ed.base + i);
-        entry.name    = null;
-        for (uint ni = 0; ni < ed.number_of_names; ni++)
-        {
-            if (ords_off + (usz)(ni + 1) * 2 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-            ushort name_ord = *(ushort*)&self.buffer[ords_off + (usz)ni * 2];
-            if (name_ord == i)
-            {
-                if (names_off + (usz)(ni + 1) * 4 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-                uint name_rva = *(uint*)&self.buffer[names_off + (usz)ni * 4];
-                entry.name = (ZString)&self.buffer[self.rva_to_offset(name_rva)!];
-                break;
-            }
-        }
-        if (func_rva >= export_dir_start && func_rva < export_dir_end)
-        {
-            entry.is_forwarder = true;
-            entry.forwarder    = (ZString)&self.buffer[self.rva_to_offset(func_rva)!];
-        }
-        else
-        {
-            entry.is_forwarder = false;
-            entry.rva          = func_rva;
-        }
-        if (!callback(&entry, user_data)) break;
-    }
 }
 
 fn void? VipeViewPe.foreach_tls_callback(&self, VipeCallbackTls callback, any user_data)
 {
-    VipeRawDataDirectory*  dir     = self.get_raw_data_directory(VipeDataDirectoryIndex.TLS)!;
-    usz                    tls_off = self.rva_to_offset(dir.virtual_address)!;
-    bool                   is64    = self.nt.is64;
-    VipeViewOptionalHeader oh      = self.nt.optional_header();
-    ulong                  ibase   = oh.get_image_base();
 
-    VipeViewTlsDirectory tls_view;
-    if (is64)
-    {
-        if (tls_off + VipeRawTlsDirectory64::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        tls_view = { .is64 = true, .tls64 = (VipeRawTlsDirectory64*)&self.buffer[tls_off] };
-    }
-    else
-    {
-        if (tls_off + VipeRawTlsDirectory32::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        tls_view = { .is64 = false, .tls32 = (VipeRawTlsDirectory32*)&self.buffer[tls_off] };
-    }
-
-    ulong callbacks_va = tls_view.get_address_of_callbacks();
-    if (callbacks_va == 0) return;
-    uint callbacks_rva = (uint)(callbacks_va - ibase);
-    usz  cb_off        = self.rva_to_offset(callbacks_rva)!;
-    while (true)
-    {
-        ulong fn_va;
-        if (is64)
-        {
-            if (cb_off + 8 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-            fn_va   = *(ulong*)&self.buffer[cb_off];
-            cb_off += 8;
-        }
-        else
-        {
-            if (cb_off + 4 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-            fn_va   = (ulong)(*(uint*)&self.buffer[cb_off]);
-            cb_off += 4;
-        }
-        if (fn_va == 0) break;
-        if (!callback(&tls_view, user_data)) break;
-    }
 }
 
 fn void? VipeViewPe.foreach_exception_x64(&self, VipeCallbackExceptionX64 callback, any user_data)
 {
-    if (self.nt.file_header().get_machine() != VipeMachineType.AMD64) return common::UNABLE_TO_RESOLVE~;
-    VipeRawDataDirectory* dir   = self.get_raw_data_directory(VipeDataDirectoryIndex.EXCEPTION)!;
-    usz                   off   = self.rva_to_offset(dir.virtual_address)!;
-    uint                  count = dir.size / (uint)VipeRawRuntimeFunction::size;
-    for (uint i = 0; i < count; i++)
-    {
-        if (off + VipeRawRuntimeFunction::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawRuntimeFunction* r  = (VipeRawRuntimeFunction*)&self.buffer[off];
-        VipeViewUnwindInfo      ui = vipe::exceptions::parse_unwind_info(self.buffer, self.sections_headers, r.unwind_info_address)!;
-        VipeExceptionX64 ex = { .raw = r, .unwind_info = ui };
-        if (!callback(&ex, user_data)) break;
-        off += VipeRawRuntimeFunction::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_exception_arm(&self, VipeCallbackExceptionArm callback, any user_data)
 {
-    VipeMachineType machine = self.nt.file_header().get_machine();
-    if (machine != VipeMachineType.ARMNT && machine != VipeMachineType.ARM64) return common::UNABLE_TO_RESOLVE~;
-    VipeRawDataDirectory* dir   = self.get_raw_data_directory(VipeDataDirectoryIndex.EXCEPTION)!;
-    usz                   off   = self.rva_to_offset(dir.virtual_address)!;
-    uint                  count = dir.size / (uint)VipeRawArmRuntimeFunction::size;
-    for (uint i = 0; i < count; i++)
-    {
-        if (off + VipeRawArmRuntimeFunction::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawArmRuntimeFunction* r  = (VipeRawArmRuntimeFunction*)&self.buffer[off];
-        bool                       ip = (r.packed_unwind & 1) != 0;
-        VipeExceptionArm ex = { .raw = r, .is_packed = ip };
-        if (!callback(&ex, user_data)) break;
-        off += VipeRawArmRuntimeFunction::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_delayed_import_descriptor(&self, VipeCallbackDelayedImportDescriptor callback, any user_data)
 {
-    VipeRawDataDirectory* dir = self.get_raw_data_directory(VipeDataDirectoryIndex.DELAY_IMPORT)!;
-    usz off = self.rva_to_offset(dir.virtual_address)!;
-    while (true)
-    {
-        if (off + VipeRawDelayImportDescriptor::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawDelayImportDescriptor* r = (VipeRawDelayImportDescriptor*)&self.buffer[off];
-        if (r.dll_name_rva == 0) break;
-        ZString dll = (ZString)&self.buffer[self.rva_to_offset(r.dll_name_rva)!];
-        VipeViewDelayedImportDescriptor desc = { .raw = r, .dll = dll };
-        if (!callback(&desc, user_data)) break;
-        off += VipeRawDelayImportDescriptor::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_delayed_import(&self, VipeCallbackDelayedImport callback, any user_data)
 {
-    VipeRawDataDirectory* dir      = self.get_raw_data_directory(VipeDataDirectoryIndex.DELAY_IMPORT)!;
-    usz                   desc_off = self.rva_to_offset(dir.virtual_address)!;
-    bool                  is64     = self.nt.is64;
-    while (true)
-    {
-        if (desc_off + VipeRawDelayImportDescriptor::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawDelayImportDescriptor* r = (VipeRawDelayImportDescriptor*)&self.buffer[desc_off];
-        if (r.dll_name_rva == 0) break;
-        usz  ilt_off   = self.rva_to_offset(r.ilt_rva)!;
-        uint entry_idx = 0;
-        while (true)
-        {
-            ulong thunk;
-            if (is64)
-            {
-                if (ilt_off + 8 > self.buffer.len) break;
-                thunk = *(ulong*)&self.buffer[ilt_off];
-                if (thunk == 0) break;
-                ilt_off += 8;
-            }
-            else
-            {
-                if (ilt_off + 4 > self.buffer.len) break;
-                thunk = (ulong)(*(uint*)&self.buffer[ilt_off]);
-                if (thunk == 0) break;
-                ilt_off += 4;
-            }
-            uint cur_iat_rva = r.iat_rva + entry_idx * (is64 ? 8u : 4u);
-            bool is_ord      = is64 ? ((thunk >> 63) != 0) : ((thunk >> 31) != 0);
-            VipeViewDelayedImport imp;
-            imp.iat_entry_rva = cur_iat_rva;
-            if (is_ord)
-            {
-                imp.is_ordinal = true;
-                imp.ordinal    = (ushort)(thunk & 0xFFFF);
-                imp.name       = (ZString)(char*)null;
-                imp.hint       = 0;
-            }
-            else
-            {
-                uint name_rva = (uint)(thunk & 0x7FFFFFFF);
-                usz  name_off = self.rva_to_offset(name_rva)!;
-                if (name_off + 2 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-                imp.hint       = *(ushort*)&self.buffer[name_off];
-                imp.name       = (ZString)&self.buffer[name_off + 2];
-                imp.ordinal    = 0;
-                imp.is_ordinal = false;
-            }
-            if (!callback(&imp, user_data)) return;
-            entry_idx++;
-        }
-        desc_off += VipeRawDelayImportDescriptor::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_bound_import(&self, VipeCallbackBoundImport callback, any user_data)
 {
-    VipeRawDataDirectory* dir      = self.get_raw_data_directory(VipeDataDirectoryIndex.BOUND_IMPORT)!;
-    usz                   base_off = (usz)dir.virtual_address;
-    usz                   off      = base_off;
-    while (true)
-    {
-        if (off + VipeRawBoundImportDescriptor::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawBoundImportDescriptor* r = (VipeRawBoundImportDescriptor*)&self.buffer[off];
-        if (r.time_date_stamp == 0 && r.offset_module_name == 0) break;
-        usz name_off = base_off + (usz)r.offset_module_name;
-        if (name_off >= self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeViewBoundImportDescriptor desc = { .raw = r, .dll = (ZString)&self.buffer[name_off] };
-        if (!callback(&desc, user_data)) break;
-        off += VipeRawBoundImportDescriptor::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_debug_entry(&self, VipeCallbackDebug callback, any user_data)
 {
-    VipeRawDataDirectory* dir   = self.get_raw_data_directory(VipeDataDirectoryIndex.DEBUG)!;
-    usz                   off   = self.rva_to_offset(dir.virtual_address)!;
-    uint                  count = dir.size / (uint)VipeRawDebugDirectory::size;
-    for (uint i = 0; i < count; i++)
-    {
-        if (off + VipeRawDebugDirectory::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawDebugDirectory* r = (VipeRawDebugDirectory*)&self.buffer[off];
-        char[] data;
-        if (r.size_of_data > 0 && r.pointer_to_raw_data > 0)
-        {
-            usz d_off = (usz)r.pointer_to_raw_data;
-            if (d_off + r.size_of_data <= self.buffer.len)
-            {
-                data = self.buffer[d_off..d_off + r.size_of_data - 1];
-            }
-        }
-        VipeViewDebug entry = { .raw = r, .data = data };
-        if (!callback(&entry, user_data)) break;
-        off += VipeRawDebugDirectory::size;
-    }
+
 }
 
 fn void? VipeViewPe.foreach_relocation(&self, VipeCallbackRelocation callback, any user_data)
 {
-    VipeRawDataDirectory* dir = self.get_raw_data_directory(VipeDataDirectoryIndex.BASERELOC)!;
-    usz off = self.rva_to_offset(dir.virtual_address)!;
-    usz end = off + (usz)dir.size;
-    while (off < end)
-    {
-        if (off + VipeRawBaseRelocation::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawBaseRelocation* block = (VipeRawBaseRelocation*)&self.buffer[off];
-        if (block.size_of_block < VipeRawBaseRelocation::size) return common::NOT_ENOUGH_DATA~;
-        uint page_rva  = block.virtual_address;
-        uint entries   = (block.size_of_block - (uint)VipeRawBaseRelocation::size) / 2;
-        usz  entry_off = off + VipeRawBaseRelocation::size;
-        for (uint i = 0; i < entries; i++)
-        {
-            if (entry_off + 2 > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-            VipeRawBaseRelocationEntry e = *(VipeRawBaseRelocationEntry*)&self.buffer[entry_off];
-            VipeViewRelocation rel = { .rva = page_rva + e.offset, .type = e.type, .offset = e.offset };
-            if (!callback(&rel, user_data)) return;
-            entry_off += 2;
-        }
-        off += (usz)block.size_of_block;
-    }
-}
 
-fn bool? VipeViewPe.walk_resource_dir(
-    &self, usz res_base, usz dir_off, uint depth,
-    uint type_id, uint name_id, VipeCallbackResource callback, any user_data)
-{
-    if (dir_off + VipeRawResourceDirectory::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-    VipeRawResourceDirectory* dir = (VipeRawResourceDirectory*)&self.buffer[dir_off];
-    uint total     = (uint)dir.number_of_named_entries + (uint)dir.number_of_id_entries;
-    usz  entry_off = dir_off + VipeRawResourceDirectory::size;
-    for (uint i = 0; i < total; i++)
-    {
-        if (entry_off + VipeRawResourceDirectoryEntry::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawResourceDirectoryEntry* e = (VipeRawResourceDirectoryEntry*)&self.buffer[entry_off];
-        entry_off += VipeRawResourceDirectoryEntry::size;
-        uint id            = e.name_or_id & 0x7FFFFFFF;
-        uint child_off_raw = e.offset_to_data_or_directory;
-        bool is_dir        = (child_off_raw >> 31) != 0;
-        usz  child_off     = res_base + (usz)(child_off_raw & 0x7FFFFFFF);
-        if (is_dir)
-        {
-            uint next_type = depth == 0 ? id : type_id;
-            uint next_name = depth == 1 ? id : name_id;
-            bool cont = self.walk_resource_dir(res_base, child_off, depth + 1, next_type, next_name, callback, user_data)!;
-            if (!cont) return false;
-        }
-        else
-        {
-            if (child_off + VipeRawResourceDataEntry::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-            VipeRawResourceDataEntry* de = (VipeRawResourceDataEntry*)&self.buffer[child_off];
-            usz data_off = self.rva_to_offset(de.offset_to_data)!;
-            char[] data;
-            if (data_off + de.size <= self.buffer.len)
-            {
-                data = self.buffer[data_off..data_off + de.size - 1];
-            }
-            VipeViewResource leaf = {
-                .raw         = de,
-                .type_id     = type_id,
-                .name_id     = name_id,
-                .language_id = id,
-                .data        = data,
-            };
-            if (!callback(&leaf, user_data)) return false;
-        }
-    }
-    return true;
 }
 
 fn void? VipeViewPe.foreach_resource(&self, VipeCallbackResource callback, any user_data)
 {
-    VipeRawDataDirectory* dir      = self.get_raw_data_directory(VipeDataDirectoryIndex.RESOURCE)!;
-    usz                   res_base = self.rva_to_offset(dir.virtual_address)!;
-    self.walk_resource_dir(res_base, res_base, 0, 0, 0, callback, user_data)!;
+
 }
 
 fn void? VipeViewPe.foreach_certificate(&self, VipeCallbackCertificate callback, any user_data)
 {
-    VipeRawDataDirectory* dir = self.get_raw_data_directory(VipeDataDirectoryIndex.CERTIFICATE)!;
-    usz off = (usz)dir.virtual_address;
-    usz end = off + (usz)dir.size;
-    while (off < end)
-    {
-        if (off + VipeRawWinCertificate::size > self.buffer.len) return common::NOT_ENOUGH_DATA~;
-        VipeRawWinCertificate* r = (VipeRawWinCertificate*)&self.buffer[off];
-        if (r.length < VipeRawWinCertificate::size) return common::NOT_ENOUGH_DATA~;
-        usz data_len = (usz)r.length - VipeRawWinCertificate::size;
-        char[] data;
-        if (data_len > 0 && off + VipeRawWinCertificate::size + data_len <= self.buffer.len)
-        {
-            data = self.buffer[off + VipeRawWinCertificate::size..off + VipeRawWinCertificate::size + data_len - 1];
-        }
-        VipeViewCertificate cert = { .raw = r, .data = data };
-        if (!callback(&cert, user_data)) break;
-        usz aligned = ((usz)r.length + 7) & ~(usz)7u;
-        off += aligned;
-    }
+
 }
 
 fn VipeViewCor20Header? VipeViewPe.cor20_header(&self)
