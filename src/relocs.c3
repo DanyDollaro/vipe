@@ -1,53 +1,60 @@
-module ope::relocs;
-import ope::common;
+module vipe::relocs;
+import vipe::common;
 
-struct OpeRawBaseRelocation @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawBaseRelocation @packed
 {
     uint virtual_address;
     uint size_of_block;
 }
 
-bitstruct OpeRawBaseRelocationEntry : ushort
+bitstruct VipeRawBaseRelocationEntry : ushort
 {
     ushort offset : 0..11;
     ushort type   : 12..15;
 }
 
-struct OpeRawDynamicRelocationTable @packed
+struct VipeRawDynamicRelocationTable @packed
 {
     uint version;
     uint size;
 }
 
-struct OpeRawDynamicRelocation @packed
+struct VipeRawDynamicRelocation @packed
 {
     uint symbol;
     uint base_reloc_size;
 }
 
-struct OpeRawDynamicRelocation2 @packed
+struct VipeRawDynamicRelocation2 @packed
 {
-    uint  header_size;
-    uint  fixup_info_size;
+    uint header_size;
+    uint fixup_info_size;
     ulong symbol;
-    uint  symbol_group;
-    uint  flags;
+    uint symbol_group;
+    uint flags;
 }
 
-struct OpeViewRelocation
+//
+// View structures definition
+//
+
+struct VipeViewRelocation
 {
-    uint   rva;
+    uint rva;
     ushort type;
     ushort offset;
 }
 
-macro uint OpeViewRelocation.rva(&self, uint v = ...)
-    => common::@exchange(self.rva, v);
+fn uint VipeViewRelocation.get_rva(&self)    => self.rva;
+fn ushort VipeViewRelocation.get_type(&self)   => self.type;
+fn ushort VipeViewRelocation.get_offset(&self) => self.offset;
 
-macro ushort OpeViewRelocation.type(&self, ushort v = ...)
-    => common::@exchange(self.type, v);
+//
+// Callbacks
+//
 
-macro ushort OpeViewRelocation.offset(&self, ushort v = ...)
-    => common::@exchange(self.offset, v);
-
-alias OpeRelocationCallback = fn bool(OpeViewRelocation*);
+alias VipeCallbackRelocation = fn bool(VipeViewRelocation*, any);

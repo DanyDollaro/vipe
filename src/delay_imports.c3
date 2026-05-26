@@ -1,7 +1,11 @@
-module ope::delay_imports;
-import ope::common;
+module vipe::delay_imports;
+import vipe::common;
 
-struct OpeRawDelayImportDescriptor @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawDelayImportDescriptor @packed
 {
     uint attributes;
     uint dll_name_rva;
@@ -13,56 +17,74 @@ struct OpeRawDelayImportDescriptor @packed
     uint timestamp;
 }
 
-struct OpeViewDelayedImportDescriptor
+//
+// View structures definition
+//
+
+struct VipeViewDelayedImportDescriptor
 {
-    OpeRawDelayImportDescriptor* raw;
-    ZString                      dll;
+    VipeRawDelayImportDescriptor* raw;
+    ZString dll;
 }
 
-macro uint OpeViewDelayedImportDescriptor.attributes(&self, uint v = ...)
-    => common::@exchange(self.raw.attributes, v);
+fn uint VipeViewDelayedImportDescriptor.get_attributes(&self)
+    => self.raw.attributes;
+fn void VipeViewDelayedImportDescriptor.set_attributes(&self, uint v)
+    => self.raw.attributes = v;
 
-macro uint OpeViewDelayedImportDescriptor.module_handle_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.module_handle_rva, v);
+fn uint VipeViewDelayedImportDescriptor.get_dll_name_rva(&self)
+    => self.raw.dll_name_rva;
+fn void VipeViewDelayedImportDescriptor.set_dll_name_rva(&self, uint v)
+    => self.raw.dll_name_rva = v;
 
-macro uint OpeViewDelayedImportDescriptor.iat_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.iat_rva, v);
+fn uint VipeViewDelayedImportDescriptor.get_module_handle_rva(&self)
+    => self.raw.module_handle_rva;
+fn void VipeViewDelayedImportDescriptor.set_module_handle_rva(&self, uint v)
+    => self.raw.module_handle_rva = v;
 
-macro uint OpeViewDelayedImportDescriptor.ilt_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.ilt_rva, v);
+fn uint VipeViewDelayedImportDescriptor.get_iat_rva(&self)
+    => self.raw.iat_rva;
+fn void VipeViewDelayedImportDescriptor.set_iat_rva(&self, uint v)
+    => self.raw.iat_rva = v;
 
-macro uint OpeViewDelayedImportDescriptor.bound_iat_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.bound_iat_rva, v);
+fn uint VipeViewDelayedImportDescriptor.get_ilt_rva(&self)
+    => self.raw.ilt_rva;
+fn void VipeViewDelayedImportDescriptor.set_ilt_rva(&self, uint v)
+    => self.raw.ilt_rva = v;
 
-macro uint OpeViewDelayedImportDescriptor.unload_iat_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.unload_iat_rva, v);
+fn uint VipeViewDelayedImportDescriptor.get_bound_iat_rva(&self)
+    => self.raw.bound_iat_rva;
+fn void VipeViewDelayedImportDescriptor.set_bound_iat_rva(&self, uint v)
+    => self.raw.bound_iat_rva = v;
 
-macro uint OpeViewDelayedImportDescriptor.timestamp(&self, uint v = ...)
-    => common::@exchange(self.raw.timestamp, v);
+fn uint VipeViewDelayedImportDescriptor.get_unload_iat_rva(&self)
+    => self.raw.unload_iat_rva;
+fn void VipeViewDelayedImportDescriptor.set_unload_iat_rva(&self, uint v)
+    => self.raw.unload_iat_rva = v;
 
-struct OpeViewDelayedImport
+fn uint VipeViewDelayedImportDescriptor.get_timestamp(&self)
+    => self.raw.timestamp;
+fn void VipeViewDelayedImportDescriptor.set_timestamp(&self, uint v)
+    => self.raw.timestamp = v;
+
+struct VipeViewDelayedImport
 {
     ZString name;
-    ushort  hint;
-    ushort  ordinal;
-    bool    is_ordinal;
-    uint    iat_entry_rva;
+    ushort hint;
+    ushort ordinal;
+    bool is_ordinal;
+    uint iat_entry_rva;
 }
 
-macro ZString OpeViewDelayedImport.name(&self, ZString v = ...)
-    => common::@exchange(self.name, v);
+fn ZString VipeViewDelayedImport.get_name(&self) => self.name;
+fn ushort VipeViewDelayedImport.get_hint(&self) => self.hint;
+fn ushort VipeViewDelayedImport.get_ordinal(&self) => self.ordinal;
+fn bool VipeViewDelayedImport.is_ordinal(&self) => self.is_ordinal;
+fn uint VipeViewDelayedImport.get_iat_entry_rva(&self) => self.iat_entry_rva;
 
-macro ushort OpeViewDelayedImport.hint(&self, ushort v = ...)
-    => common::@exchange(self.hint, v);
+//
+// Callbacks
+//
 
-macro ushort OpeViewDelayedImport.ordinal(&self, ushort v = ...)
-    => common::@exchange(self.ordinal, v);
-
-macro bool OpeViewDelayedImport.is_ordinal(&self, bool v = ...)
-    => common::@exchange(self.is_ordinal, v);
-
-macro uint OpeViewDelayedImport.iat_entry_rva(&self, uint v = ...)
-    => common::@exchange(self.iat_entry_rva, v);
-
-alias OpeDelayedImportDescriptorCallback = fn bool(OpeViewDelayedImportDescriptor*);
-alias OpeDelayedImportCallback           = fn bool(OpeViewDelayedImport*);
+alias VipeCallbackDelayedImportDescriptor = fn bool(VipeViewDelayedImportDescriptor*, any);
+alias VipeCallbackDelayedImport = fn bool(VipeViewDelayedImport*, any);

@@ -1,39 +1,50 @@
-module ope::bound_imports;
-import ope::common;
+module vipe::bound_imports;
+import vipe::common;
 
-struct OpeRawBoundImportDescriptor @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawBoundImportDescriptor @packed
 {
-    uint   time_date_stamp;
+    uint time_date_stamp;
     ushort offset_module_name;
     ushort number_of_module_forwarder_refs;
 }
 
-struct OpeViewBoundImportDescriptor
+//
+// View structures definition
+//
+
+struct VipeViewBoundImportDescriptor
 {
-    OpeRawBoundImportDescriptor* raw;
-    ZString                      dll;
+    VipeRawBoundImportDescriptor* raw;
+    ZString dll;
 }
 
-macro uint OpeViewBoundImportDescriptor.time_date_stamp(&self, uint v = ...)
-    => common::@exchange(self.raw.time_date_stamp, v);
+fn uint VipeViewBoundImportDescriptor.get_time_date_stamp(&self)
+    => self.raw.time_date_stamp;
+fn void VipeViewBoundImportDescriptor.set_time_date_stamp(&self, uint v)
+    => self.raw.time_date_stamp = v;
 
-macro ushort OpeViewBoundImportDescriptor.number_of_module_forwarder_refs(&self, ushort v = ...)
-    => common::@exchange(self.raw.number_of_module_forwarder_refs, v);
+fn ushort VipeViewBoundImportDescriptor.get_number_of_module_forwarder_refs(&self)
+    => self.raw.number_of_module_forwarder_refs;
+fn void VipeViewBoundImportDescriptor.set_number_of_module_forwarder_refs(&self, ushort v)
+    => self.raw.number_of_module_forwarder_refs = v;
 
-struct OpeViewBoundImport
+struct VipeViewBoundImport
 {
     ZString dll;
-    uint    time_date_stamp;
-    ushort  number_of_module_forwarder_refs;
+    uint time_date_stamp;
+    ushort number_of_module_forwarder_refs;
 }
 
-macro ZString OpeViewBoundImport.dll(&self, ZString v = ...)
-    => common::@exchange(self.dll, v);
+fn ZString VipeViewBoundImport.get_dll(&self) => self.dll;
+fn uint VipeViewBoundImport.get_time_date_stamp(&self) => self.time_date_stamp;
+fn ushort VipeViewBoundImport.get_number_of_module_forwarder_refs(&self) => self.number_of_module_forwarder_refs;
 
-macro uint OpeViewBoundImport.time_date_stamp(&self, uint v = ...)
-    => common::@exchange(self.time_date_stamp, v);
+//
+// Callbacks
+//
 
-macro ushort OpeViewBoundImport.number_of_module_forwarder_refs(&self, ushort v = ...)
-    => common::@exchange(self.number_of_module_forwarder_refs, v);
-
-alias OpeBoundImportCallback = fn bool(OpeViewBoundImportDescriptor*);
+alias VipeCallbackBoundImport = fn bool(VipeViewBoundImportDescriptor*, any);

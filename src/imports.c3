@@ -1,7 +1,11 @@
-module ope::imports;
-import ope::common;
+module vipe::imports;
+import vipe::common;
 
-struct OpeRawImportDescriptor @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawImportDescriptor @packed
 {
     uint original_first_thunk;
     uint time_date_stamp;
@@ -10,13 +14,13 @@ struct OpeRawImportDescriptor @packed
     uint first_thunk;
 }
 
-struct OpeRawImportByName @packed
+struct VipeRawImportByName @packed
 {
     ushort hint;
-    char   name;
+    char name;
 }
 
-union OpeRawThunkData32 @packed
+union VipeRawThunkData32 @packed
 {
     uint forwarder_string;
     uint function_ptr;
@@ -24,7 +28,7 @@ union OpeRawThunkData32 @packed
     uint address_of_data;
 }
 
-union OpeRawThunkData64 @packed
+union VipeRawThunkData64 @packed
 {
     ulong forwarder_string;
     ulong function_ptr;
@@ -32,50 +36,72 @@ union OpeRawThunkData64 @packed
     ulong address_of_data;
 }
 
-struct OpeViewImportDescriptor
+//
+// View structures definition
+//
+
+struct VipeViewImportDescriptor
 {
-    OpeRawImportDescriptor* raw;
-    ZString                 dll;
-}
-
-macro uint OpeViewImportDescriptor.original_first_thunk(&self, uint v = ...)
-    => common::@exchange(self.raw.original_first_thunk, v);
-
-macro uint OpeViewImportDescriptor.time_date_stamp(&self, uint v = ...)
-    => common::@exchange(self.raw.time_date_stamp, v);
-
-macro uint OpeViewImportDescriptor.forwarder_chain(&self, uint v = ...)
-    => common::@exchange(self.raw.forwarder_chain, v);
-
-macro uint OpeViewImportDescriptor.name_rva(&self, uint v = ...)
-    => common::@exchange(self.raw.name_rva, v);
-
-macro uint OpeViewImportDescriptor.first_thunk(&self, uint v = ...)
-    => common::@exchange(self.raw.first_thunk, v);
-
-struct OpeViewImport
-{
+    VipeRawImportDescriptor* raw;
     ZString name;
-    ushort  hint;
-    ushort  ordinal;
-    bool    is_ordinal;
-    uint    iat_entry_rva;
+    usz index;
 }
 
-macro ZString OpeViewImport.name(&self, ZString v = ...)
-    => common::@exchange(self.name, v);
+fn uint VipeViewImportDescriptor.get_original_first_thunk_rva(&self)
+    => self.raw.original_first_thunk;
+fn void VipeViewImportDescriptor.set_original_first_thunk_rva(&self, uint v)
+    => self.raw.original_first_thunk = v;
 
-macro ushort OpeViewImport.hint(&self, ushort v = ...)
-    => common::@exchange(self.hint, v);
+fn uint VipeViewImportDescriptor.get_time_date_stamp(&self)
+    => self.raw.time_date_stamp;
+fn void VipeViewImportDescriptor.set_time_date_stamp(&self, uint v)
+    => self.raw.time_date_stamp = v;
 
-macro ushort OpeViewImport.ordinal(&self, ushort v = ...)
-    => common::@exchange(self.ordinal, v);
+fn uint VipeViewImportDescriptor.get_forwarder_chain(&self)
+    => self.raw.forwarder_chain;
+fn void VipeViewImportDescriptor.set_forwarder_chain(&self, uint v)
+    => self.raw.forwarder_chain = v;
 
-macro bool OpeViewImport.is_ordinal(&self, bool v = ...)
-    => common::@exchange(self.is_ordinal, v);
+fn uint VipeViewImportDescriptor.get_name_rva(&self)
+    => self.raw.name_rva;
+fn void VipeViewImportDescriptor.set_name_rva(&self, uint v)
+    => self.raw.name_rva = v;
 
-macro uint OpeViewImport.iat_entry_rva(&self, uint v = ...)
-    => common::@exchange(self.iat_entry_rva, v);
+fn uint VipeViewImportDescriptor.get_first_thunk_rva(&self)
+    => self.raw.first_thunk;
+fn void VipeViewImportDescriptor.set_first_thunk_rva(&self, uint v)
+    => self.raw.first_thunk = v;
 
-alias OpeImportDescriptorCallback = fn bool(OpeViewImportDescriptor*);
-alias OpeImportCallback           = fn bool(OpeViewImport*);
+fn ZString VipeViewImportDescriptor.get_name()
+    => name;
+
+fn usz VipeViewImportDescriptor.get_index()
+    => index;
+
+struct VipeViewImport
+{
+    VipeViewImportDescriptor* descriptor;
+    union
+    {
+        VipeRawThunkData32* thunk32;
+        VipeRawThunkData64* thunk64;
+    }
+    sz thunk_index;
+    VipeRawImportByName* import_by_name;
+}
+
+fn ZString VipeViewImport.get_name(&self) => self.name;
+
+fn ushort VipeViewImport.get_hint(&self) => self.hint;
+fn ushort VipeViewImport.get_ordinal(&self) => self.ordinal;
+fn bool VipeViewImport.is_ordinal(&self) => self.is_ordinal;
+
+fn uint VipeViewImport.get_iat_entry_rva(&self) => self.iat_entry_rva;
+fn void VipeViewImport.set_iat_entry_rva(&self, uint v) => self.iat_entry_rva = v;
+
+//
+// View structures definition
+//
+
+alias VipeImportDescriptorCallback = fn bool(VipeViewImportDescriptor*, any);
+alias VipeImportCallback = fn bool(VipeViewImport*, any);

@@ -1,43 +1,86 @@
-module ope::headers::nt;
-import ope::common;
-import ope::headers::file;
-import ope::headers::optional;
+module vipe::headers::nt;
+import vipe::common;
+import vipe::headers::file;
+import vipe::headers::optional;
 
-struct OpeRawNtHeaders32 @packed
+const uint PE_SIGNATURE = 0x00004550;
+
+//
+// Raw structures definition
+//
+
+struct VipeRawNtHeaders32 @packed
 {
-    uint                   signature;
-    OpeRawFileHeader       file_header;
-    OpeRawOptionalHeader32 optional_header;
+    uint signature;
+    VipeRawFileHeader file_header;
+    VipeRawOptionalHeader32 optional_header;
 }
 
-struct OpeRawNtHeaders64 @packed
+struct VipeRawNtHeaders64 @packed
 {
-    uint                   signature;
-    OpeRawFileHeader       file_header;
-    OpeRawOptionalHeader64 optional_header;
+    uint signature;
+    VipeRawFileHeader file_header;
+    VipeRawOptionalHeader64 optional_header;
 }
 
-struct OpeViewNtHeaders
+//
+// View structures definition
+//
+
+struct VipeViewNtHeaders
 {
     bool is64;
     union
     {
-        OpeRawNtHeaders32* h32;
-        OpeRawNtHeaders64* h64;
+        VipeRawNtHeaders32* h32;
+        VipeRawNtHeaders64* h64;
     }
 }
 
-macro uint OpeViewNtHeaders.signature(&self, uint v = ...)
-    => common::@exchange(self.is64 ? self.h64.signature : self.h32.signature, v);
-
-fn OpeViewFileHeader OpeViewNtHeaders.file_header(&self)
+fn void VipeViewNtHeaders.set(&self, bool is64, void* nt_headers)
 {
-    if (self.is64) return { .raw = &self.h64.file_header };
-    return             { .raw = &self.h32.file_header };
+    *self = {
+        .is64 = is64
+    };
+    if (is64)
+    {
+        self.h64 = nt_headers;
+    }
+    else
+    {
+        self.h32 = nt_headers;
+    }
 }
 
-fn OpeViewOptionalHeader OpeViewNtHeaders.optional_header(&self)
+fn uint VipeViewNtHeaders.get_signature(&self)
+    => self.is64 ? self.h64.signature : self.h32.signature;
+fn void VipeViewNtHeaders.set_signature(&self, uint v)
 {
-    if (self.is64) return { .is64 = true,  .h64 = &self.h64.optional_header };
-    return             { .is64 = false, .h32 = &self.h32.optional_header };
+    if (self.is64) { self.h64.signature = v; }
+    else           { self.h32.signature = v; }
+}
+
+fn VipeViewFileHeader VipeViewNtHeaders.file_header(&self)
+{
+    return {
+        .raw = self.is64
+            ? &self.h64.file_header
+            : &self.h32.file_header
+    };
+}
+
+fn VipeViewOptionalHeader VipeViewNtHeaders.optional_header(&self)
+{
+    VipeViewOptionalHeader optional_header = {
+        .is64 = self.is64
+    };
+    if (self.is64)
+    {
+        optional_header.h64 = &self.h64.optional_header;
+    }
+    else
+    {
+        optional_header.h32 = &self.h32.optional_header;
+    }
+    return optional_header;
 }

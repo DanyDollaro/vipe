@@ -1,23 +1,27 @@
-module ope::exceptions;
-import ope::common;
-import ope::sections;
+module vipe::exceptions;
+import vipe::common;
+import vipe::sections;
 
-constdef OpeUnwindInfoFlag
+constdef VipeUnwindInfoFlag
 {
     NHANDLER  = 0x0,
     EHANDLER  = 0x1,
     UHANDLER  = 0x2,
-    CHAININFO = 0x4,
+    CHAININFO = 0x4
 }
 
-struct OpeRawRuntimeFunction @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawRuntimeFunction @packed
 {
     uint begin_address;
     uint end_address;
     uint unwind_info_address;
 }
 
-struct OpeRawArmRuntimeFunction @packed
+struct VipeRawArmRuntimeFunction @packed
 {
     uint begin_address;
     union
@@ -27,28 +31,28 @@ struct OpeRawArmRuntimeFunction @packed
     }
 }
 
-bitstruct OpeRawUnwindCode : ushort
+bitstruct VipeRawUnwindCode : ushort
 {
     char code_offset    : 0..7;
     char unwind_op      : 8..11;
     char operation_info : 12..15;
 }
 
-bitstruct OpeRawUnwindInfoFlags : char
+bitstruct VipeRawUnwindInfoFlags : char
 {
     char version : 0..2;
     char flags   : 3..7;
 }
 
-struct OpeRawUnwindInfo @packed
+struct VipeRawUnwindInfo @packed
 {
-    OpeRawUnwindInfoFlags version_flags;
+    VipeRawUnwindInfoFlags version_flags;
     char size_of_prolog;
     char count_of_codes;
     char frame_register_offset;
 }
 
-struct OpeRawScopeTableEntry32 @packed
+struct VipeRawScopeTableEntry32 @packed
 {
     uint begin_address;
     uint end_address;
@@ -56,50 +60,72 @@ struct OpeRawScopeTableEntry32 @packed
     uint jump_target;
 }
 
-struct OpeRawExceptionRegistration32 @packed
+struct VipeRawExceptionRegistration32 @packed
 {
     uint next;
     uint handler;
 }
 
-struct OpeViewUnwindInfo
+//
+// View structures definition
+//
+
+struct VipeViewUnwindInfo
 {
-    OpeRawUnwindInfo*      raw;
-    OpeRawUnwindCode[]     unwind_codes;
-    uint                   handler_rva;
-    OpeRawRuntimeFunction* chained_entry;
+    VipeRawUnwindInfo*      raw;
+    VipeRawUnwindCode[]     unwind_codes;
+    uint                    handler_rva;
+    VipeRawRuntimeFunction* chained_entry;
 }
 
-fn char OpeViewUnwindInfo.version(&self)        => self.raw.version_flags.version;
-fn char OpeViewUnwindInfo.flags(&self)          => self.raw.version_flags.flags;
-fn char OpeViewUnwindInfo.size_of_prolog(&self) => self.raw.size_of_prolog;
-fn char OpeViewUnwindInfo.frame_register(&self) => self.raw.frame_register_offset & 0x0F;
-fn char OpeViewUnwindInfo.frame_offset(&self)   => (self.raw.frame_register_offset >> 4) & 0x0F;
+fn char VipeViewUnwindInfo.get_version(&self)        => self.raw.version_flags.version;
+fn char VipeViewUnwindInfo.get_flags(&self)          => self.raw.version_flags.flags;
+fn char VipeViewUnwindInfo.get_size_of_prolog(&self) => self.raw.size_of_prolog;
+fn char VipeViewUnwindInfo.get_frame_register(&self) => self.raw.frame_register_offset & 0x0F;
+fn char VipeViewUnwindInfo.get_frame_offset(&self)   => (self.raw.frame_register_offset >> 4) & 0x0F;
 
-struct OpeX64Exception
+struct VipeExceptionX64
 {
-    OpeRawRuntimeFunction* raw;
-    OpeViewUnwindInfo      unwind_info;
+    VipeRawRuntimeFunction* raw;
+    VipeViewUnwindInfo      unwind_info;
 }
 
-fn uint OpeX64Exception.begin_address(&self)   => self.raw.begin_address;
-fn uint OpeX64Exception.end_address(&self)     => self.raw.end_address;
-fn uint OpeX64Exception.unwind_info_rva(&self) => self.raw.unwind_info_address;
+fn uint VipeExceptionX64.get_begin_address(&self)   => self.raw.begin_address;
+fn void VipeExceptionX64.set_begin_address(&self, uint v) => self.raw.begin_address = v;
 
-struct OpeArmException
+fn uint VipeExceptionX64.get_end_address(&self)     => self.raw.end_address;
+fn void VipeExceptionX64.set_end_address(&self, uint v) => self.raw.end_address = v;
+
+fn uint VipeExceptionX64.get_unwind_info_rva(&self) => self.raw.unwind_info_address;
+fn void VipeExceptionX64.set_unwind_info_rva(&self, uint v) => self.raw.unwind_info_address = v;
+
+struct VipeExceptionArm
 {
-    OpeRawArmRuntimeFunction* raw;
-    bool                      is_packed;
+    VipeRawArmRuntimeFunction* raw;
+    bool                       is_packed;
 }
 
-fn uint OpeArmException.begin_address(&self) => self.raw.begin_address;
-fn uint OpeArmException.xdata_rva(&self)     => self.raw.unwind_data;
-fn uint OpeArmException.packed_unwind(&self) => self.raw.packed_unwind;
+fn uint VipeExceptionArm.get_begin_address(&self) => self.raw.begin_address;
+fn void VipeExceptionArm.set_begin_address(&self, uint v) => self.raw.begin_address = v;
 
-alias OpeX64ExceptionCallback = fn bool(OpeX64Exception*);
-alias OpeArmExceptionCallback = fn bool(OpeArmException*);
+fn uint VipeExceptionArm.get_xdata_rva(&self)     => self.raw.unwind_data;
+fn void VipeExceptionArm.set_xdata_rva(&self, uint v) => self.raw.unwind_data = v;
 
-fn OpeViewUnwindInfo? parse_unwind_info(char[] buffer, OpeRawSectionHeader[] sections, uint ui_rva)
+fn uint VipeExceptionArm.get_packed_unwind(&self) => self.raw.packed_unwind;
+fn void VipeExceptionArm.set_packed_unwind(&self, uint v) => self.raw.packed_unwind = v;
+
+//
+// Callbacks
+//
+
+alias VipeCallbackExceptionX64 = fn bool(VipeExceptionX64*, any);
+alias VipeCallbackExceptionArm = fn bool(VipeExceptionArm*, any);
+
+//
+// Parsing
+//
+
+fn VipeViewUnwindInfo? parse_unwind_info(char[] buffer, VipeRawSectionHeader[] sections, uint ui_rva)
 {
     usz ui_off = 0;
     foreach (s : sections)
@@ -111,31 +137,31 @@ fn OpeViewUnwindInfo? parse_unwind_info(char[] buffer, OpeRawSectionHeader[] sec
         }
     }
     if (ui_off == 0) return common::UNABLE_TO_RESOLVE~;
-    if (ui_off + OpeRawUnwindInfo::size > buffer.len) return common::TRUNCATED_DATA~;
-    OpeRawUnwindInfo* ui = (OpeRawUnwindInfo*)&buffer[ui_off];
+    if (ui_off + VipeRawUnwindInfo::size > buffer.len) return common::NOT_ENOUGH_DATA~;
+    VipeRawUnwindInfo* ui = (VipeRawUnwindInfo*)&buffer[ui_off];
 
-    usz codes_off   = ui_off + OpeRawUnwindInfo::size;
+    usz codes_off   = ui_off + VipeRawUnwindInfo::size;
     usz code_count  = (usz)(char)ui.count_of_codes;
-    usz codes_bytes = code_count * OpeRawUnwindCode::size;
-    if (codes_off + codes_bytes > buffer.len) return common::TRUNCATED_DATA~;
+    usz codes_bytes = code_count * VipeRawUnwindCode::size;
+    if (codes_off + codes_bytes > buffer.len) return common::NOT_ENOUGH_DATA~;
 
-    OpeRawUnwindCode[] codes = ((OpeRawUnwindCode*)&buffer[codes_off])[0..code_count - 1];
+    VipeRawUnwindCode[] codes = ((VipeRawUnwindCode*)&buffer[codes_off])[0..code_count - 1];
 
     usz padded_count = (code_count + 1) & ~(usz)1;
-    usz after_codes  = codes_off + padded_count * OpeRawUnwindCode::size;
+    usz after_codes  = codes_off + padded_count * VipeRawUnwindCode::size;
 
     char flags = ui.version_flags.flags;
     uint handler_rva = 0;
-    OpeRawRuntimeFunction* chained = null;
+    VipeRawRuntimeFunction* chained = null;
 
-    if ((flags & (char)OpeUnwindInfoFlag.CHAININFO) != 0)
+    if ((flags & (char)VipeUnwindInfoFlag.CHAININFO) != 0)
     {
-        if (after_codes + OpeRawRuntimeFunction::size > buffer.len) return common::TRUNCATED_DATA~;
-        chained = (OpeRawRuntimeFunction*)&buffer[after_codes];
+        if (after_codes + VipeRawRuntimeFunction::size > buffer.len) return common::NOT_ENOUGH_DATA~;
+        chained = (VipeRawRuntimeFunction*)&buffer[after_codes];
     }
-    else if ((flags & ((char)OpeUnwindInfoFlag.EHANDLER | (char)OpeUnwindInfoFlag.UHANDLER)) != 0)
+    else if ((flags & ((char)VipeUnwindInfoFlag.EHANDLER | (char)VipeUnwindInfoFlag.UHANDLER)) != 0)
     {
-        if (after_codes + 4 > buffer.len) return common::TRUNCATED_DATA~;
+        if (after_codes + 4 > buffer.len) return common::NOT_ENOUGH_DATA~;
         handler_rva = *(uint*)&buffer[after_codes];
     }
 

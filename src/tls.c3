@@ -1,7 +1,11 @@
-module ope::tls;
-import ope::common;
+module vipe::tls;
+import vipe::common;
 
-struct OpeRawTlsDirectory32 @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawTlsDirectory32 @packed
 {
     uint raw_data_start_va;
     uint raw_data_end_va;
@@ -11,42 +15,80 @@ struct OpeRawTlsDirectory32 @packed
     uint characteristics;
 }
 
-struct OpeRawTlsDirectory64 @packed
+struct VipeRawTlsDirectory64 @packed
 {
     ulong raw_data_start_va;
     ulong raw_data_end_va;
     ulong address_of_index;
     ulong address_of_callbacks;
-    uint  size_of_zero_fill;
-    uint  characteristics;
+    uint size_of_zero_fill;
+    uint characteristics;
 }
 
-struct OpeViewTlsDirectory
+//
+// View structures definition
+//
+
+struct VipeViewTlsDirectory
 {
     bool is64;
     union
     {
-        OpeRawTlsDirectory32* tls32;
-        OpeRawTlsDirectory64* tls64;
+        VipeRawTlsDirectory32* tls32;
+        VipeRawTlsDirectory64* tls64;
     }
 }
 
-macro ulong OpeViewTlsDirectory.raw_data_start_va(&self, ulong v = ...)
-    => common::@exchange(self.is64 ? self.tls64.raw_data_start_va : (ulong)self.tls32.raw_data_start_va, self.is64 ? v : (uint)v);
+fn ulong VipeViewTlsDirectory.get_raw_data_start_va(&self)
+    => self.is64 ? self.tls64.raw_data_start_va : (ulong)self.tls32.raw_data_start_va;
+fn void VipeViewTlsDirectory.set_raw_data_start_va(&self, ulong v)
+{
+    if (self.is64) { self.tls64.raw_data_start_va = v; }
+    else           { self.tls32.raw_data_start_va = (uint)v; }
+}
 
-macro ulong OpeViewTlsDirectory.raw_data_end_va(&self, ulong v = ...)
-    => common::@exchange(self.is64 ? self.tls64.raw_data_end_va : (ulong)self.tls32.raw_data_end_va, self.is64 ? v : (uint)v);
+fn ulong VipeViewTlsDirectory.get_raw_data_end_va(&self)
+    => self.is64 ? self.tls64.raw_data_end_va : (ulong)self.tls32.raw_data_end_va;
+fn void VipeViewTlsDirectory.set_raw_data_end_va(&self, ulong v)
+{
+    if (self.is64) { self.tls64.raw_data_end_va = v; }
+    else           { self.tls32.raw_data_end_va = (uint)v; }
+}
 
-macro ulong OpeViewTlsDirectory.address_of_index(&self, ulong v = ...)
-    => common::@exchange(self.is64 ? self.tls64.address_of_index : (ulong)self.tls32.address_of_index, self.is64 ? v : (uint)v);
+fn ulong VipeViewTlsDirectory.get_address_of_index(&self)
+    => self.is64 ? self.tls64.address_of_index : (ulong)self.tls32.address_of_index;
+fn void VipeViewTlsDirectory.set_address_of_index(&self, ulong v)
+{
+    if (self.is64) { self.tls64.address_of_index = v; }
+    else           { self.tls32.address_of_index = (uint)v; }
+}
 
-macro ulong OpeViewTlsDirectory.address_of_callbacks(&self, ulong v = ...)
-    => common::@exchange(self.is64 ? self.tls64.address_of_callbacks : (ulong)self.tls32.address_of_callbacks, self.is64 ? v : (uint)v);
+fn ulong VipeViewTlsDirectory.get_address_of_callbacks(&self)
+    => self.is64 ? self.tls64.address_of_callbacks : (ulong)self.tls32.address_of_callbacks;
+fn void VipeViewTlsDirectory.set_address_of_callbacks(&self, ulong v)
+{
+    if (self.is64) { self.tls64.address_of_callbacks = v; }
+    else           { self.tls32.address_of_callbacks = (uint)v; }
+}
 
-macro uint OpeViewTlsDirectory.size_of_zero_fill(&self, uint v = ...)
-    => common::@exchange(self.is64 ? self.tls64.size_of_zero_fill : self.tls32.size_of_zero_fill, v);
+fn uint VipeViewTlsDirectory.get_size_of_zero_fill(&self)
+    => self.is64 ? self.tls64.size_of_zero_fill : self.tls32.size_of_zero_fill;
+fn void VipeViewTlsDirectory.set_size_of_zero_fill(&self, uint v)
+{
+    if (self.is64) { self.tls64.size_of_zero_fill = v; }
+    else           { self.tls32.size_of_zero_fill = v; }
+}
 
-macro uint OpeViewTlsDirectory.characteristics(&self, uint v = ...)
-    => common::@exchange(self.is64 ? self.tls64.characteristics : self.tls32.characteristics, v);
+fn uint VipeViewTlsDirectory.get_characteristics(&self)
+    => self.is64 ? self.tls64.characteristics : self.tls32.characteristics;
+fn void VipeViewTlsDirectory.set_characteristics(&self, uint v)
+{
+    if (self.is64) { self.tls64.characteristics = v; }
+    else           { self.tls32.characteristics = v; }
+}
 
-alias OpeTlsCallback = fn bool(OpeViewTlsDirectory*);
+//
+// Callbacks
+//
+
+alias VipeCallbackTls = fn bool(VipeViewTlsDirectory*, any);

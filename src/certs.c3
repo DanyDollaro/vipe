@@ -1,27 +1,45 @@
-module ope::certs;
-import ope::common;
+module vipe::certs;
+import vipe::common;
 
-struct OpeRawWinCertificate @packed
+//
+// Raw structures definition
+//
+
+struct VipeRawWinCertificate @packed
 {
-    uint   length;
+    uint length;
     ushort revision;
     ushort certificate_type;
-    char   certificate;
+    char certificate;
 }
 
-struct OpeViewCertificate
+//
+// View structures definition
+//
+
+struct VipeViewCertificate
 {
-    OpeRawWinCertificate* raw;
-    char[]                data;
+    VipeRawWinCertificate* raw;
+    char[] data;
 }
 
-macro uint OpeViewCertificate.length(&self, uint v = ...)
-    => common::@exchange(#self.raw.length, v);
+fn uint VipeViewCertificate.get_length(&self)
+    => self.raw.length;
+fn void VipeViewCertificate.set_length(&self, uint v)
+    => self.raw.length = v;
 
-macro ushort OpeViewCertificate.revision(&self, ushort v = ...)
-    => common::@exchange(#self.raw.revision, v);
+fn ushort VipeViewCertificate.get_revision(&self)
+    => self.raw.revision;
+fn void VipeViewCertificate.set_revision(&self, ushort v)
+    => self.raw.revision = v;
 
-macro ushort OpeViewCertificate.certificate_type(&self, ushort v = ...)
-    => common::@exchange(#self.raw.certificate_type, v);
+fn ushort VipeViewCertificate.get_certificate_type(&self)
+    => self.raw.certificate_type;
+fn void VipeViewCertificate.set_certificate_type(&self, ushort v)
+    => self.raw.certificate_type = v;
 
-alias OpeCertificateCallback = fn bool(OpeViewCertificate*);
+//
+// Callbacks
+//
+
+alias VipeCallbackCertificate = fn bool(VipeViewCertificate*, any);

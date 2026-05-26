@@ -1,9 +1,9 @@
-module ope::common;
+module vipe::common;
 
 faultdef
-    SIGNATURE_MISMATCH,
+    INVALID_PE,
     MISSING_RESOURCE,
-    TRUNCATED_DATA,
+    NOT_ENOUGH_DATA,
     UNABLE_TO_RESOLVE,
     EXPORTED_BY_ORDINAL;
 
@@ -20,6 +20,23 @@ macro @exchange(#self, #val = ...)
 
 macro extract_struct($Type, char[] buffer)
 {
-    if (buffer.len < $Type::size) return common::TRUNCATED_DATA~;
+    if (buffer.len < $Type::size)
+    {
+        return common::NOT_ENOUGH_DATA~;
+    }
+
     return ($Type*)buffer.ptr;
+}
+
+fn bool is_zero_struct(void* ptr, sz size)
+{
+    for (sz i = 0; i < size; i++)
+    {
+        if (*(char*)ptr)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
