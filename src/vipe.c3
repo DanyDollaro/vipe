@@ -185,7 +185,7 @@ fn void? VipeViewPe.foreach_import_descriptor(&self, VipeImportDescriptorCallbac
         VipeRawImportDescriptor* r =
             common::extract_struct(VipeRawImportDescriptor, self.buffer[offset..])!;
 
-        if (common::is_zero_struct(r, VipeRawImportDescriptor::size))
+        if (*r = (VipeRawImportDescriptor){})
         {
             break;
         }
@@ -206,28 +206,9 @@ fn void? VipeViewPe.foreach_import_descriptor(&self, VipeImportDescriptorCallbac
     }
 }
 
-struct VipeImportCallbackData @local
-{
-    VipeCallbackImport callback;
-    VipeViewPe* pe;
-    any user_data;
-}
-
 fn void? VipeViewPe.foreach_import(&self, VipeCallbackImport callback, any user_data)
 {
-    any data = &&(VipeImportCallbackData){
-        .callback  = callback,
-        .pe        = self,
-        .user_data = user_data
-    };
 
-    self.foreach_import_descriptor(fn bool (VipeViewImportDescriptor* descriptor, any data) {
-
-        // The '!!' should never happen
-        VipeImportCallbackData* callback_data = anycast(data, VipeImportCallbackData)!!;
-
-        return true;
-    }, data)!;
 }
 
 fn void? VipeViewPe.foreach_export(&self, VipeCallbackExport callback, any user_data)

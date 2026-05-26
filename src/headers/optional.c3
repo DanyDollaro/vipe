@@ -357,6 +357,7 @@ fn void VipeViewOptionalHeader.set_number_of_rva_and_sizes(&self, uint v)
     else           { self.h32.number_of_rva_and_sizes = v; }
 }
 
+// TODO: add index checking
 fn VipeRawDataDirectory* VipeViewOptionalHeader.data_directory(&self, VipeDataDirectoryIndex i)
     => self.is64
         ? &self.h64.data_directory[(uint)i]

@@ -28,15 +28,3 @@ macro extract_struct($Type, char[] buffer)
     return ($Type*)buffer.ptr;
 }
 
-fn bool is_zero_struct(void* ptr, sz size)
-{
-    for (sz i = 0; i < size; i++)
-    {
-        if (*(char*)ptr)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}

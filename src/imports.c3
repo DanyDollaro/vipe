@@ -72,10 +72,10 @@ fn uint VipeViewImportDescriptor.get_first_thunk_rva(&self)
 fn void VipeViewImportDescriptor.set_first_thunk_rva(&self, uint v)
     => self.raw.first_thunk = v;
 
-fn ZString VipeViewImportDescriptor.get_name()
+fn ZString VipeViewImportDescriptor.get_name(&self)
     => name;
 
-fn usz VipeViewImportDescriptor.get_index()
+fn usz VipeViewImportDescriptor.get_index(&self)
     => index;
 
 struct VipeViewImport
@@ -87,7 +87,7 @@ struct VipeViewImport
         VipeRawThunkData64* thunk64;
     }
     sz thunk_index;
-    VipeRawImportByName* import_by_name;
+    VipeRawImportByName* imports_by_name;
 }
 
 fn ZString VipeViewImport.get_name(&self) => self.name;
