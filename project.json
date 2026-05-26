@@ -29,7 +29,7 @@
   // "target": "windows-x64",
   // Targets.
   "targets": {
-    "ope": {
+    "vipe": {
       // Executable or library.
       "type": "executable",
       // Additional libraries, sources
