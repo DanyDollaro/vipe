@@ -4,8 +4,7 @@ faultdef
     INVALID_PE,
     MISSING_RESOURCE,
     NOT_ENOUGH_DATA,
-    UNABLE_TO_RESOLVE,
-    EXPORTED_BY_ORDINAL;
+    UNABLE_TO_RESOLVE;
 
 macro @exchange(#self, #val = ...)
 {
