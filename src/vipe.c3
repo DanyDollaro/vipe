@@ -164,9 +164,7 @@ fn void VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any user
     {
         VipeViewSection section = {
             .raw  = s,
-            .data = self.buffer[
-                s.pointer_to_raw_data .. s.pointer_to_raw_data + s.size_of_raw_data - 1
-            ]
+            .data = self.buffer[s.pointer_to_raw_data : s.size_of_raw_data]
         };
 
         if (!callback(&section, user_data))
