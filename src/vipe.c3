@@ -149,12 +149,9 @@ fn VipeRawDataDirectory*? VipeViewPe.get_raw_data_directory(&self, VipeDataDirec
         .optional_header()
         .data_directory(i);
 
-    if (!data_directory.virtual_address || !data_directory.size)
-    {
-        return common::MISSING_RESOURCE~;
-    }
-
-    return data_directory;
+    return data_directory.virtual_address && data_directory.size
+        ? data_directory
+        : common::MISSING_RESOURCE~;
 }
 
 fn void VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any user_data)
