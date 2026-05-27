@@ -28,9 +28,9 @@ import vipe::clr;
 
 struct VipeViewPe
 {
-    char[]                buffer;
-    VipeViewDosHeader     dos;
-    VipeViewNtHeaders     nt;
+    char[] buffer;
+    VipeViewDosHeader dos;
+    VipeViewNtHeaders nt;
     VipeRawSectionHeader[] sections_headers;
 }
 
