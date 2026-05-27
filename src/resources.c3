@@ -94,4 +94,4 @@ macro uint VipeViewResource.language_id(&self)
 // Callbacks
 //
 
-alias VipeCallbackResource = fn bool(VipeViewResource*, any);
+alias VipeCallbackResource = fn void?(VipeViewResource*, any);

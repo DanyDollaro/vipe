@@ -74,10 +74,7 @@ fn void? VipeViewDebugDirectory.foreach_debug_entry(&self, char[][] data_slices,
             .raw  = &self.entries[i],
             .data = data_slices[i]
         };
-        if (!callback(&entry, user_data))
-        {
-            break;
-        }
+        callback(&entry, user_data)!;
     }
 }
 
@@ -85,4 +82,4 @@ fn void? VipeViewDebugDirectory.foreach_debug_entry(&self, char[][] data_slices,
 // Callbacks
 //
 
-alias VipeCallbackDebug = fn bool(VipeViewDebug*, any);
+alias VipeCallbackDebug = fn void?(VipeViewDebug*, any);

@@ -34,4 +34,4 @@ macro ushort VipeViewCertificate.certificate_type(&self, ushort v = ...)
 // Callbacks
 //
 
-alias VipeCallbackCertificate = fn bool(VipeViewCertificate*, any);
+alias VipeCallbackCertificate = fn void?(VipeViewCertificate*, any);

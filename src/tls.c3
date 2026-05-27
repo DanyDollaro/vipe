@@ -69,4 +69,4 @@ macro uint VipeViewTlsDirectory.characteristics(&self, uint v = ...)
 // Callbacks
 //
 
-alias VipeCallbackTls = fn bool(VipeViewTlsDirectory*, any);
+alias VipeCallbackTls = fn void?(VipeViewTlsDirectory*, any);

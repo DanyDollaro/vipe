@@ -60,4 +60,4 @@ macro ushort VipeViewRelocation.offset(&self)
 // Callbacks
 //
 
-alias VipeCallbackRelocation = fn bool(VipeViewRelocation*, any);
+alias VipeCallbackRelocation = fn void?(VipeViewRelocation*, any);

@@ -81,5 +81,5 @@ macro uint    VipeViewImport.iat_entry_rva(&self, uint v = ...)
 // Callbacks
 //
 
-alias VipeCallbackImportDescriptor = fn bool(VipeViewImportDescriptor*, any);
-alias VipeCallbackImport = fn bool(VipeViewImport*, any);
+alias VipeCallbackImportDescriptor = fn void?(VipeViewImportDescriptor*, any);
+alias VipeCallbackImport = fn void?(VipeViewImport*, any);

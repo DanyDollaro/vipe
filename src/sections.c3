@@ -73,4 +73,4 @@ macro uint VipeViewSection.characteristics(&self, uint v = ...)
 // Callbacks
 //
 
-alias VipeCallbackSection = fn bool(VipeViewSection*, any);
+alias VipeCallbackSection = fn void?(VipeViewSection*, any);
