@@ -60,15 +60,16 @@ fn void? VipeViewPe.set(&self, char[] buffer)
     VipeViewNtHeaders nt_headers;
     switch (*optional_header_magic)
     {
+        // TODO: write a function to do not manage these fields directly
         case optional::PE32_MAGIC:
             nt_headers = {
                 .is64 = false,
-                .h32 = common::extract_struct(VipeRawNtHeaders32, buffer[nt_base..])!
+                .raw32 = common::extract_struct(VipeRawNtHeaders32, buffer[nt_base..])!
             };
         case optional::PE32PLUS_MAGIC:
             nt_headers = {
                 .is64 = true,
-                .h64 = common::extract_struct(VipeRawNtHeaders64, buffer[nt_base..])!
+                .raw64 = common::extract_struct(VipeRawNtHeaders64, buffer[nt_base..])!
             };
         default:
             return common::INVALID_PE~;

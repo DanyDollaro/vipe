@@ -32,35 +32,20 @@ struct VipeViewNtHeaders
     bool is64;
     union
     {
-        VipeRawNtHeaders32* h32;
-        VipeRawNtHeaders64* h64;
-    }
-}
-
-fn void VipeViewNtHeaders.set(&self, bool is64, void* nt_headers)
-{
-    *self = {
-        .is64 = is64
-    };
-    if (is64)
-    {
-        self.h64 = nt_headers;
-    }
-    else
-    {
-        self.h32 = nt_headers;
+        VipeRawNtHeaders32* raw32;
+        VipeRawNtHeaders64* raw64;
     }
 }
 
 macro uint VipeViewNtHeaders.signature(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.signature, self.h32.signature, v);
+    => common::@select_exchange(self.is64, self.raw64.signature, self.raw32.signature, v);
 
 fn VipeViewFileHeader VipeViewNtHeaders.file_header(&self)
 {
     return {
         .raw = self.is64
-            ? &self.h64.file_header
-            : &self.h32.file_header
+            ? &self.raw64.file_header
+            : &self.raw32.file_header
     };
 }
 
@@ -71,11 +56,11 @@ fn VipeViewOptionalHeader VipeViewNtHeaders.optional_header(&self)
     };
     if (self.is64)
     {
-        optional_header.h64 = &self.h64.optional_header;
+        optional_header.raw64 = &self.raw64.optional_header;
     }
     else
     {
-        optional_header.h32 = &self.h32.optional_header;
+        optional_header.raw32 = &self.raw32.optional_header;
     }
 
     return optional_header;

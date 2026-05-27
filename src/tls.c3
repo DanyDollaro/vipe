@@ -34,36 +34,36 @@ struct VipeViewTlsDirectory
     bool is64;
     union
     {
-        VipeRawTlsDirectory32* tls32;
-        VipeRawTlsDirectory64* tls64;
+        VipeRawTlsDirectory32* raw32;
+        VipeRawTlsDirectory64* raw64;
     }
 }
 
 macro ulong VipeViewTlsDirectory.raw_data_start_va(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.tls64.raw_data_start_va, v)
-        : common::@exchange(self.tls32.raw_data_start_va, (uint)v);
+        ? common::@exchange(self.raw64.raw_data_start_va, v)
+        : common::@exchange(self.raw32.raw_data_start_va, (uint)v);
 
 macro ulong VipeViewTlsDirectory.raw_data_end_va(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.tls64.raw_data_end_va, v)
-        : common::@exchange(self.tls32.raw_data_end_va, (uint)v);
+        ? common::@exchange(self.raw64.raw_data_end_va, v)
+        : common::@exchange(self.raw32.raw_data_end_va, (uint)v);
 
 macro ulong VipeViewTlsDirectory.address_of_index(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.tls64.address_of_index, v)
-        : common::@exchange(self.tls32.address_of_index, (uint)v);
+        ? common::@exchange(self.raw64.address_of_index, v)
+        : common::@exchange(self.raw32.address_of_index, (uint)v);
 
 macro ulong VipeViewTlsDirectory.address_of_callbacks(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.tls64.address_of_callbacks, v)
-        : common::@exchange(self.tls32.address_of_callbacks, (uint)v);
+        ? common::@exchange(self.raw64.address_of_callbacks, v)
+        : common::@exchange(self.raw32.address_of_callbacks, (uint)v);
 
 macro uint VipeViewTlsDirectory.size_of_zero_fill(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.tls64.size_of_zero_fill, self.tls32.size_of_zero_fill, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_zero_fill, self.raw32.size_of_zero_fill, v);
 
 macro uint VipeViewTlsDirectory.characteristics(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.tls64.characteristics, self.tls32.characteristics, v);
+    => common::@select_exchange(self.is64, self.raw64.characteristics, self.raw32.characteristics, v);
 
 //
 // Callbacks

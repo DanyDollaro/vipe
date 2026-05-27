@@ -110,115 +110,115 @@ struct VipeViewOptionalHeader
     bool is64;
     union
     {
-        VipeRawOptionalHeader32* h32;
-        VipeRawOptionalHeader64* h64;
+        VipeRawOptionalHeader32* raw32;
+        VipeRawOptionalHeader64* raw64;
     }
 }
 
 macro ushort VipeViewOptionalHeader.magic(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.magic, self.h32.magic, v);
+    => common::@select_exchange(self.is64, self.raw64.magic, self.raw32.magic, v);
 
 macro char VipeViewOptionalHeader.major_linker_version(&self, char v = ...)
-    => common::@select_exchange(self.is64, self.h64.major_linker_version, self.h32.major_linker_version, v);
+    => common::@select_exchange(self.is64, self.raw64.major_linker_version, self.raw32.major_linker_version, v);
 
 macro char VipeViewOptionalHeader.minor_linker_version(&self, char v = ...)
-    => common::@select_exchange(self.is64, self.h64.minor_linker_version, self.h32.minor_linker_version, v);
+    => common::@select_exchange(self.is64, self.raw64.minor_linker_version, self.raw32.minor_linker_version, v);
 
 macro uint VipeViewOptionalHeader.size_of_code(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.size_of_code, self.h32.size_of_code, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_code, self.raw32.size_of_code, v);
 
 macro uint VipeViewOptionalHeader.size_of_initialized_data(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.size_of_initialized_data, self.h32.size_of_initialized_data, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_initialized_data, self.raw32.size_of_initialized_data, v);
 
 macro uint VipeViewOptionalHeader.size_of_uninitialized_data(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.size_of_uninitialized_data, self.h32.size_of_uninitialized_data, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_uninitialized_data, self.raw32.size_of_uninitialized_data, v);
 
 macro uint VipeViewOptionalHeader.address_of_entry_point(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.address_of_entry_point, self.h32.address_of_entry_point, v);
+    => common::@select_exchange(self.is64, self.raw64.address_of_entry_point, self.raw32.address_of_entry_point, v);
 
 macro uint VipeViewOptionalHeader.base_of_code(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.base_of_code, self.h32.base_of_code, v);
+    => common::@select_exchange(self.is64, self.raw64.base_of_code, self.raw32.base_of_code, v);
 
 macro uint? VipeViewOptionalHeader.base_of_data(&self, uint v = ...)
     => self.is64
         ? common::MISSING_RESOURCE~
-        : common::@exchange(self.h32.base_of_data, v);
+        : common::@exchange(self.raw32.base_of_data, v);
 
 macro ulong VipeViewOptionalHeader.image_base(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.h64.image_base, v)
-        : common::@exchange(self.h32.image_base, (uint)v);
+        ? common::@exchange(self.raw64.image_base, v)
+        : common::@exchange(self.raw32.image_base, (uint)v);
 
 macro uint VipeViewOptionalHeader.section_alignment(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.section_alignment, self.h32.section_alignment, v);
+    => common::@select_exchange(self.is64, self.raw64.section_alignment, self.raw32.section_alignment, v);
 
 macro uint VipeViewOptionalHeader.file_alignment(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.file_alignment, self.h32.file_alignment, v);
+    => common::@select_exchange(self.is64, self.raw64.file_alignment, self.raw32.file_alignment, v);
 
 macro ushort VipeViewOptionalHeader.major_operating_system_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.major_operating_system_version, self.h32.major_operating_system_version, v);
+    => common::@select_exchange(self.is64, self.raw64.major_operating_system_version, self.raw32.major_operating_system_version, v);
 
 macro ushort VipeViewOptionalHeader.minor_operating_system_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.minor_operating_system_version, self.h32.minor_operating_system_version, v);
+    => common::@select_exchange(self.is64, self.raw64.minor_operating_system_version, self.raw32.minor_operating_system_version, v);
 
 macro ushort VipeViewOptionalHeader.major_image_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.major_image_version, self.h32.major_image_version, v);
+    => common::@select_exchange(self.is64, self.raw64.major_image_version, self.raw32.major_image_version, v);
 
 macro ushort VipeViewOptionalHeader.minor_image_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.minor_image_version, self.h32.minor_image_version, v);
+    => common::@select_exchange(self.is64, self.raw64.minor_image_version, self.raw32.minor_image_version, v);
 
 macro ushort VipeViewOptionalHeader.major_subsystem_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.major_subsystem_version, self.h32.major_subsystem_version, v);
+    => common::@select_exchange(self.is64, self.raw64.major_subsystem_version, self.raw32.major_subsystem_version, v);
 
 macro ushort VipeViewOptionalHeader.minor_subsystem_version(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.minor_subsystem_version, self.h32.minor_subsystem_version, v);
+    => common::@select_exchange(self.is64, self.raw64.minor_subsystem_version, self.raw32.minor_subsystem_version, v);
 
 macro uint VipeViewOptionalHeader.win32_version_value(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.win32_version_value, self.h32.win32_version_value, v);
+    => common::@select_exchange(self.is64, self.raw64.win32_version_value, self.raw32.win32_version_value, v);
 
 macro uint VipeViewOptionalHeader.size_of_image(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.size_of_image, self.h32.size_of_image, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_image, self.raw32.size_of_image, v);
 
 macro uint VipeViewOptionalHeader.size_of_headers(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.size_of_headers, self.h32.size_of_headers, v);
+    => common::@select_exchange(self.is64, self.raw64.size_of_headers, self.raw32.size_of_headers, v);
 
 macro uint VipeViewOptionalHeader.check_sum(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.check_sum, self.h32.check_sum, v);
+    => common::@select_exchange(self.is64, self.raw64.check_sum, self.raw32.check_sum, v);
 
 macro ushort VipeViewOptionalHeader.subsystem(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.subsystem, self.h32.subsystem, v);
+    => common::@select_exchange(self.is64, self.raw64.subsystem, self.raw32.subsystem, v);
 
 macro ushort VipeViewOptionalHeader.dll_characteristics(&self, ushort v = ...)
-    => common::@select_exchange(self.is64, self.h64.dll_characteristics, self.h32.dll_characteristics, v);
+    => common::@select_exchange(self.is64, self.raw64.dll_characteristics, self.raw32.dll_characteristics, v);
 
 macro ulong VipeViewOptionalHeader.size_of_stack_reserve(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.h64.size_of_stack_reserve, v)
-        : common::@exchange(self.h32.size_of_stack_reserve, (uint)v);
+        ? common::@exchange(self.raw64.size_of_stack_reserve, v)
+        : common::@exchange(self.raw32.size_of_stack_reserve, (uint)v);
 
 macro ulong VipeViewOptionalHeader.size_of_stack_commit(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.h64.size_of_stack_commit, v)
-        : common::@exchange(self.h32.size_of_stack_commit, (uint)v);
+        ? common::@exchange(self.raw64.size_of_stack_commit, v)
+        : common::@exchange(self.raw32.size_of_stack_commit, (uint)v);
 
 macro ulong VipeViewOptionalHeader.size_of_heap_reserve(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.h64.size_of_heap_reserve, v)
-        : common::@exchange(self.h32.size_of_heap_reserve, (uint)v);
+        ? common::@exchange(self.raw64.size_of_heap_reserve, v)
+        : common::@exchange(self.raw32.size_of_heap_reserve, (uint)v);
 
 macro ulong VipeViewOptionalHeader.size_of_heap_commit(&self, ulong v = ...)
     => self.is64
-        ? common::@exchange(self.h64.size_of_heap_commit, v)
-        : common::@exchange(self.h32.size_of_heap_commit, (uint)v);
+        ? common::@exchange(self.raw64.size_of_heap_commit, v)
+        : common::@exchange(self.raw32.size_of_heap_commit, (uint)v);
 
 macro uint VipeViewOptionalHeader.loader_flags(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.loader_flags, self.h32.loader_flags, v);
+    => common::@select_exchange(self.is64, self.raw64.loader_flags, self.raw32.loader_flags, v);
 
 macro uint VipeViewOptionalHeader.number_of_rva_and_sizes(&self, uint v = ...)
-    => common::@select_exchange(self.is64, self.h64.number_of_rva_and_sizes, self.h32.number_of_rva_and_sizes, v);
+    => common::@select_exchange(self.is64, self.raw64.number_of_rva_and_sizes, self.raw32.number_of_rva_and_sizes, v);
 
 // TODO: add index checking
 fn VipeRawDataDirectory* VipeViewOptionalHeader.data_directory(&self, VipeDataDirectoryIndex i)
     => self.is64
-        ? &self.h64.data_directory[(int)i]
-        : &self.h32.data_directory[(int)i];
+        ? &self.raw64.data_directory[(int)i]
+        : &self.raw32.data_directory[(int)i];
