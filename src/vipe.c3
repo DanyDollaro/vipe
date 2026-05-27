@@ -137,10 +137,14 @@ fn usz? VipeViewPe.offset_to_rva(&self, usz offset)
     return common::UNABLE_TO_RESOLVE~;
 }
 
-fn VipeViewDosHeader      VipeViewPe.dos_header(&self)      => self.dos;
-fn VipeViewNtHeaders      VipeViewPe.nt_headers(&self)      => self.nt;
-fn VipeViewFileHeader     VipeViewPe.file_header(&self)     => self.nt.file_header();
-fn VipeViewOptionalHeader VipeViewPe.optional_header(&self) => self.nt.optional_header();
+fn VipeViewDosHeader VipeViewPe.dos_header(&self)
+    => self.dos;
+fn VipeViewNtHeaders VipeViewPe.nt_headers(&self)
+    => self.nt;
+fn VipeViewFileHeader VipeViewPe.file_header(&self)
+    => self.nt.file_header();
+fn VipeViewOptionalHeader VipeViewPe.optional_header(&self)
+    => self.nt.optional_header();
 
 fn VipeRawDataDirectory*? VipeViewPe.get_raw_data_directory(&self, VipeDataDirectoryIndex i)
 {
