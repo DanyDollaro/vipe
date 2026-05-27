@@ -23,20 +23,12 @@ struct VipeViewCertificate
     char[] data;
 }
 
-fn uint VipeViewCertificate.get_length(&self)
-    => self.raw.length;
-fn void VipeViewCertificate.set_length(&self, uint v)
-    => self.raw.length = v;
-
-fn ushort VipeViewCertificate.get_revision(&self)
-    => self.raw.revision;
-fn void VipeViewCertificate.set_revision(&self, ushort v)
-    => self.raw.revision = v;
-
-fn ushort VipeViewCertificate.get_certificate_type(&self)
-    => self.raw.certificate_type;
-fn void VipeViewCertificate.set_certificate_type(&self, ushort v)
-    => self.raw.certificate_type = v;
+macro uint   VipeViewCertificate.length(&self, uint v = ...)
+    => common::@exchange(#self.raw.length, v);
+macro ushort VipeViewCertificate.revision(&self, ushort v = ...)
+    => common::@exchange(#self.raw.revision, v);
+macro ushort VipeViewCertificate.certificate_type(&self, ushort v = ...)
+    => common::@exchange(#self.raw.certificate_type, v);
 
 //
 // Callbacks

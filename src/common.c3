@@ -18,6 +18,19 @@ macro @exchange(#self, #val = ...)
     $endif
 }
 
+macro @select_exchange(bool condition, #field1, #field2, #val = ...)
+{
+    $if $defined(val):
+        return condition
+            ? @exchange(#field1, #val)
+            : @exchange(#field2, #val);
+    $else
+        return condition
+            ? #field1
+            : #field2;
+    $endif
+}
+
 macro extract_struct($Type, char[] buffer)
 {
     if (buffer.len < $Type::size)
@@ -28,3 +41,16 @@ macro extract_struct($Type, char[] buffer)
     return ($Type*)buffer.ptr;
 }
 
+
+fn bool is_zero_struct(void* ptr, sz size)
+{
+    for (sz i = 0; i < size; i++)
+    {
+        if (*(char*)ptr)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

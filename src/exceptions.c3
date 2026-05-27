@@ -78,11 +78,11 @@ struct VipeViewUnwindInfo
     VipeRawRuntimeFunction* chained_entry;
 }
 
-fn char VipeViewUnwindInfo.get_version(&self)        => self.raw.version_flags.version;
-fn char VipeViewUnwindInfo.get_flags(&self)          => self.raw.version_flags.flags;
-fn char VipeViewUnwindInfo.get_size_of_prolog(&self) => self.raw.size_of_prolog;
-fn char VipeViewUnwindInfo.get_frame_register(&self) => self.raw.frame_register_offset & 0x0F;
-fn char VipeViewUnwindInfo.get_frame_offset(&self)   => (self.raw.frame_register_offset >> 4) & 0x0F;
+fn char VipeViewUnwindInfo.version(&self)        => self.raw.version_flags.version;
+fn char VipeViewUnwindInfo.flags(&self)          => self.raw.version_flags.flags;
+fn char VipeViewUnwindInfo.size_of_prolog(&self) => self.raw.size_of_prolog;
+fn char VipeViewUnwindInfo.frame_register(&self) => self.raw.frame_register_offset & 0x0F;
+fn char VipeViewUnwindInfo.frame_offset(&self)   => (self.raw.frame_register_offset >> 4) & 0x0F;
 
 struct VipeExceptionX64
 {
@@ -90,14 +90,12 @@ struct VipeExceptionX64
     VipeViewUnwindInfo      unwind_info;
 }
 
-fn uint VipeExceptionX64.get_begin_address(&self)   => self.raw.begin_address;
-fn void VipeExceptionX64.set_begin_address(&self, uint v) => self.raw.begin_address = v;
-
-fn uint VipeExceptionX64.get_end_address(&self)     => self.raw.end_address;
-fn void VipeExceptionX64.set_end_address(&self, uint v) => self.raw.end_address = v;
-
-fn uint VipeExceptionX64.get_unwind_info_rva(&self) => self.raw.unwind_info_address;
-fn void VipeExceptionX64.set_unwind_info_rva(&self, uint v) => self.raw.unwind_info_address = v;
+macro uint VipeExceptionX64.begin_address(&self, uint v = ...)
+    => common::@exchange(self.raw.begin_address, v);
+macro uint VipeExceptionX64.end_address(&self, uint v = ...)
+    => common::@exchange(self.raw.end_address, v);
+macro uint VipeExceptionX64.unwind_info_rva(&self, uint v = ...)
+    => common::@exchange(self.raw.unwind_info_address, v);
 
 struct VipeExceptionArm
 {
@@ -105,14 +103,12 @@ struct VipeExceptionArm
     bool                       is_packed;
 }
 
-fn uint VipeExceptionArm.get_begin_address(&self) => self.raw.begin_address;
-fn void VipeExceptionArm.set_begin_address(&self, uint v) => self.raw.begin_address = v;
-
-fn uint VipeExceptionArm.get_xdata_rva(&self)     => self.raw.unwind_data;
-fn void VipeExceptionArm.set_xdata_rva(&self, uint v) => self.raw.unwind_data = v;
-
-fn uint VipeExceptionArm.get_packed_unwind(&self) => self.raw.packed_unwind;
-fn void VipeExceptionArm.set_packed_unwind(&self, uint v) => self.raw.packed_unwind = v;
+macro uint VipeExceptionArm.begin_address(&self, uint v = ...)
+    => common::@exchange(self.raw.begin_address, v);
+macro uint VipeExceptionArm.xdata_rva(&self, uint v = ...)
+    => common::@exchange(self.raw.unwind_data, v);
+macro uint VipeExceptionArm.packed_unwind(&self, uint v = ...)
+    => common::@exchange(self.raw.packed_unwind, v);
 
 //
 // Callbacks

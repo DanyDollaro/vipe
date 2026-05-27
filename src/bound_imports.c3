@@ -22,15 +22,10 @@ struct VipeViewBoundImportDescriptor
     ZString dll;
 }
 
-fn uint VipeViewBoundImportDescriptor.get_time_date_stamp(&self)
-    => self.raw.time_date_stamp;
-fn void VipeViewBoundImportDescriptor.set_time_date_stamp(&self, uint v)
-    => self.raw.time_date_stamp = v;
-
-fn ushort VipeViewBoundImportDescriptor.get_number_of_module_forwarder_refs(&self)
-    => self.raw.number_of_module_forwarder_refs;
-fn void VipeViewBoundImportDescriptor.set_number_of_module_forwarder_refs(&self, ushort v)
-    => self.raw.number_of_module_forwarder_refs = v;
+macro uint   VipeViewBoundImportDescriptor.time_date_stamp(&self, uint v = ...)
+    => common::@exchange(self.raw.time_date_stamp, v);
+macro ushort VipeViewBoundImportDescriptor.number_of_module_forwarder_refs(&self, ushort v = ...)
+    => common::@exchange(self.raw.number_of_module_forwarder_refs, v);
 
 struct VipeViewBoundImport
 {
@@ -39,9 +34,12 @@ struct VipeViewBoundImport
     ushort number_of_module_forwarder_refs;
 }
 
-fn ZString VipeViewBoundImport.get_dll(&self) => self.dll;
-fn uint VipeViewBoundImport.get_time_date_stamp(&self) => self.time_date_stamp;
-fn ushort VipeViewBoundImport.get_number_of_module_forwarder_refs(&self) => self.number_of_module_forwarder_refs;
+macro ZString VipeViewBoundImport.dll(&self)
+    => self.dll;
+macro uint    VipeViewBoundImport.time_date_stamp(&self)
+    => self.time_date_stamp;
+macro ushort  VipeViewBoundImport.number_of_module_forwarder_refs(&self)
+    => self.number_of_module_forwarder_refs;
 
 //
 // Callbacks

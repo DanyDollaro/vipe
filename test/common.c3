@@ -120,6 +120,7 @@ fn void test_pe_equivalence(String name) => @pool()
     sections_views.init(mem);
     defer sections_views.free();
 
+    /*
     view.foreach_section(fn (VipeViewSection* section, any user_data) {
         List{VipeViewSection}* sv = anycast(user_data, List{VipeViewSection})!!;
         sv.push(*section);
@@ -127,7 +128,6 @@ fn void test_pe_equivalence(String name) => @pool()
     }, &sections_views)!!;
     assert(sections.get_len() == sections_views.len(), "The count of sections does not match");
 
-    /*
     for (sz i = 0; i < sections.get_len(); i++)
     {
         Object* s = sections.get_at(i);

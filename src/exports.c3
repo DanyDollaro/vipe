@@ -29,60 +29,28 @@ struct VipeViewExportDirectory
     VipeRawExportDirectory* raw;
 }
 
-fn uint VipeViewExportDirectory.get_characteristics(&self)
-    => self.raw.characteristics;
-fn void VipeViewExportDirectory.set_characteristics(&self, uint v)
-    => self.raw.characteristics = v;
-
-fn uint VipeViewExportDirectory.get_time_date_stamp(&self)
-    => self.raw.time_date_stamp;
-fn void VipeViewExportDirectory.set_time_date_stamp(&self, uint v)
-    => self.raw.time_date_stamp = v;
-
-fn ushort VipeViewExportDirectory.get_major_version(&self)
-    => self.raw.major_version;
-fn void VipeViewExportDirectory.set_major_version(&self, ushort v)
-    => self.raw.major_version = v;
-
-fn ushort VipeViewExportDirectory.get_minor_version(&self)
-    => self.raw.minor_version;
-fn void VipeViewExportDirectory.set_minor_version(&self, ushort v)
-    => self.raw.minor_version = v;
-
-fn uint VipeViewExportDirectory.get_name_rva(&self)
-    => self.raw.name_rva;
-fn void VipeViewExportDirectory.set_name_rva(&self, uint v)
-    => self.raw.name_rva = v;
-
-fn uint VipeViewExportDirectory.get_base(&self)
-    => self.raw.base;
-fn void VipeViewExportDirectory.set_base(&self, uint v)
-    => self.raw.base = v;
-
-fn uint VipeViewExportDirectory.get_number_of_functions(&self)
-    => self.raw.number_of_functions;
-fn void VipeViewExportDirectory.set_number_of_functions(&self, uint v)
-    => self.raw.number_of_functions = v;
-
-fn uint VipeViewExportDirectory.get_number_of_names(&self)
-    => self.raw.number_of_names;
-fn void VipeViewExportDirectory.set_number_of_names(&self, uint v)
-    => self.raw.number_of_names = v;
-
-fn uint VipeViewExportDirectory.get_address_of_functions(&self)
-    => self.raw.address_of_functions;
-fn void VipeViewExportDirectory.set_address_of_functions(&self, uint v)
-    => self.raw.address_of_functions = v;
-
-fn uint VipeViewExportDirectory.get_address_of_names(&self)
-    => self.raw.address_of_names;
-fn void VipeViewExportDirectory.set_address_of_names(&self, uint v)
-    => self.raw.address_of_names = v;
-
-fn uint VipeViewExportDirectory.get_address_of_name_ordinals(&self)
-    => self.raw.address_of_name_ordinals;
-fn void VipeViewExportDirectory.set_address_of_name_ordinals(&self, uint v)
-    => self.raw.address_of_name_ordinals = v;
+macro uint   VipeViewExportDirectory.characteristics(&self, uint v = ...)
+    => common::@exchange(self.raw.characteristics, v);
+macro uint   VipeViewExportDirectory.time_date_stamp(&self, uint v = ...)
+    => common::@exchange(self.raw.time_date_stamp, v);
+macro ushort VipeViewExportDirectory.major_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.major_version, v);
+macro ushort VipeViewExportDirectory.minor_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.minor_version, v);
+macro uint   VipeViewExportDirectory.name_rva(&self, uint v = ...)
+    => common::@exchange(self.raw.name_rva, v);
+macro uint   VipeViewExportDirectory.base(&self, uint v = ...)
+    => common::@exchange(self.raw.base, v);
+macro uint   VipeViewExportDirectory.number_of_functions(&self, uint v = ...)
+    => common::@exchange(self.raw.number_of_functions, v);
+macro uint   VipeViewExportDirectory.number_of_names(&self, uint v = ...)
+    => common::@exchange(self.raw.number_of_names, v);
+macro uint   VipeViewExportDirectory.address_of_functions(&self, uint v = ...)
+    => common::@exchange(self.raw.address_of_functions, v);
+macro uint   VipeViewExportDirectory.address_of_names(&self, uint v = ...)
+    => common::@exchange(self.raw.address_of_names, v);
+macro uint   VipeViewExportDirectory.address_of_name_ordinals(&self, uint v = ...)
+    => common::@exchange(self.raw.address_of_name_ordinals, v);
 
 struct VipeViewExport
 {
@@ -96,26 +64,16 @@ struct VipeViewExport
     }
 }
 
-fn ZString VipeViewExport.get_name(&self)
-    => self.name;
-
-fn ushort VipeViewExport.get_ordinal(&self)
-    => self.ordinal;
-fn void VipeViewExport.set_ordinal(&self, ushort v)
-    => self.ordinal = v;
-
-fn bool VipeViewExport.is_forwarder(&self)
+macro ZString VipeViewExport.name(&self, ZString v = ...)
+    => common::@exchange(self.name, v);
+macro ushort  VipeViewExport.ordinal(&self, ushort v = ...)
+    => common::@exchange(self.ordinal, v);
+macro bool    VipeViewExport.is_forwarder(&self)
     => self.is_forwarder;
-
-fn uint VipeViewExport.get_rva(&self)
-    => self.rva;
-fn void VipeViewExport.set_rva(&self, uint v)
-    => self.rva = v;
-
-fn ZString VipeViewExport.get_forwarder(&self)
-    => self.forwarder;
-fn void VipeViewExport.set_forwarder(&self, ZString v)
-    => self.forwarder = v;
+macro uint    VipeViewExport.rva(&self, uint v = ...)
+    => common::@exchange(self.rva, v);
+macro ZString VipeViewExport.forwarder(&self, ZString v = ...)
+    => common::@exchange(self.forwarder, v);
 
 //
 // Callbacks

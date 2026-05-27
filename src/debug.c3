@@ -44,45 +44,22 @@ struct VipeViewDebug
     char[] data;
 }
 
-fn uint VipeViewDebug.get_characteristics(&self)
-    => self.raw.characteristics;
-fn void VipeViewDebug.set_characteristics(&self, uint v)
-    => self.raw.characteristics = v;
-
-fn uint VipeViewDebug.get_time_date_stamp(&self)
-    => self.raw.time_date_stamp;
-fn void VipeViewDebug.set_time_date_stamp(&self, uint v)
-    => self.raw.time_date_stamp = v;
-
-fn ushort VipeViewDebug.get_major_version(&self)
-    => self.raw.major_version;
-fn void VipeViewDebug.set_major_version(&self, ushort v)
-    => self.raw.major_version = v;
-
-fn ushort VipeViewDebug.get_minor_version(&self)
-    => self.raw.minor_version;
-fn void VipeViewDebug.set_minor_version(&self, ushort v)
-    => self.raw.minor_version = v;
-
-fn uint VipeViewDebug.get_type(&self)
-    => self.raw.type;
-fn void VipeViewDebug.set_type(&self, uint v)
-    => self.raw.type = v;
-
-fn uint VipeViewDebug.get_size_of_data(&self)
-    => self.raw.size_of_data;
-fn void VipeViewDebug.set_size_of_data(&self, uint v)
-    => self.raw.size_of_data = v;
-
-fn uint VipeViewDebug.get_rva(&self)
-    => self.raw.address_of_raw_data;
-fn void VipeViewDebug.set_rva(&self, uint v)
-    => self.raw.address_of_raw_data = v;
-
-fn uint VipeViewDebug.get_file_offset(&self)
-    => self.raw.pointer_to_raw_data;
-fn void VipeViewDebug.set_file_offset(&self, uint v)
-    => self.raw.pointer_to_raw_data = v;
+macro uint   VipeViewDebug.characteristics(&self, uint v = ...)
+    => common::@exchange(self.raw.characteristics, v);
+macro uint   VipeViewDebug.time_date_stamp(&self, uint v = ...)
+    => common::@exchange(self.raw.time_date_stamp, v);
+macro ushort VipeViewDebug.major_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.major_version, v);
+macro ushort VipeViewDebug.minor_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.minor_version, v);
+macro uint   VipeViewDebug.type(&self, uint v = ...)
+    => common::@exchange(self.raw.type, v);
+macro uint   VipeViewDebug.size_of_data(&self, uint v = ...)
+    => common::@exchange(self.raw.size_of_data, v);
+macro uint   VipeViewDebug.rva(&self, uint v = ...)
+    => common::@exchange(self.raw.address_of_raw_data, v);
+macro uint   VipeViewDebug.file_offset(&self, uint v = ...)
+    => common::@exchange(self.raw.pointer_to_raw_data, v);
 
 struct VipeViewDebugDirectory
 {

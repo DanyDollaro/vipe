@@ -31,30 +31,20 @@ struct VipeViewCor20Header
     VipeRawCor20Header* raw;
 }
 
-fn uint VipeViewCor20Header.get_cb(&self)
-    => self.raw.cb;
-fn void VipeViewCor20Header.set_cb(&self, uint v)
-    => self.raw.cb = v;
+macro uint VipeViewCor20Header.cb(&self, uint v = ...)
+    => common::@exchange(self.raw.cb, v);
 
-fn ushort VipeViewCor20Header.get_major_runtime_version(&self)
-    => self.raw.major_runtime_version;
-fn void VipeViewCor20Header.set_major_runtime_version(&self, ushort v)
-    => self.raw.major_runtime_version = v;
+macro ushort VipeViewCor20Header.major_runtime_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.major_runtime_version, v);
 
-fn ushort VipeViewCor20Header.get_minor_runtime_version(&self)
-    => self.raw.minor_runtime_version;
-fn void VipeViewCor20Header.set_minor_runtime_version(&self, ushort v)
-    => self.raw.minor_runtime_version = v;
+macro ushort VipeViewCor20Header.minor_runtime_version(&self, ushort v = ...)
+    => common::@exchange(self.raw.minor_runtime_version, v);
 
-fn uint VipeViewCor20Header.get_flags(&self)
-    => self.raw.flags;
-fn void VipeViewCor20Header.set_flags(&self, uint v)
-    => self.raw.flags = v;
+macro uint VipeViewCor20Header.flags(&self, uint v = ...)
+    => common::@exchange(self.raw.flags, v);
 
-fn uint VipeViewCor20Header.get_entry_point_token_or_rva(&self)
-    => self.raw.entry_point_token_or_rva;
-fn void VipeViewCor20Header.set_entry_point_token_or_rva(&self, uint v)
-    => self.raw.entry_point_token_or_rva = v;
+macro uint VipeViewCor20Header.entry_point_token_or_rva(&self, uint v = ...)
+    => common::@exchange(self.raw.entry_point_token_or_rva, v);
 
 fn VipeRawDataDirectory* VipeViewCor20Header.meta_data(&self)
     => &self.raw.meta_data;

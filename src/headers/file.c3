@@ -34,37 +34,23 @@ struct VipeViewFileHeader
     VipeRawFileHeader* raw;
 }
 
-fn VipeMachineType VipeViewFileHeader.get_machine(&self)
-    => self.raw.machine;
-fn void VipeViewFileHeader.set_machine(&self, VipeMachineType v)
-    => self.raw.machine = v;
+macro VipeMachineType VipeViewFileHeader.machine(&self, VipeMachineType v = ...)
+    => common::@exchange(self.raw.machine, v);
 
-fn ushort VipeViewFileHeader.get_number_of_sections(&self)
-    => self.raw.number_of_sections;
-fn void VipeViewFileHeader.set_number_of_sections(&self, ushort v)
-    => self.raw.number_of_sections = v;
+macro ushort VipeViewFileHeader.number_of_sections(&self, ushort v = ...)
+    => common::@exchange(self.raw.number_of_sections, v);
 
-fn uint VipeViewFileHeader.get_time_date_stamp(&self)
-    => self.raw.time_date_stamp;
-fn void VipeViewFileHeader.set_time_date_stamp(&self, uint v)
-    => self.raw.time_date_stamp = v;
+macro uint VipeViewFileHeader.time_date_stamp(&self, uint v = ...)
+    => common::@exchange(self.raw.time_date_stamp, v);
 
-fn uint VipeViewFileHeader.get_pointer_to_symbol_table(&self)
-    => self.raw.pointer_to_symbol_table;
-fn void VipeViewFileHeader.set_pointer_to_symbol_table(&self, uint v)
-    => self.raw.pointer_to_symbol_table = v;
+macro uint VipeViewFileHeader.pointer_to_symbol_table(&self, uint v = ...)
+    => common::@exchange(self.raw.pointer_to_symbol_table, v);
 
-fn uint VipeViewFileHeader.get_number_of_symbols(&self)
-    => self.raw.number_of_symbols;
-fn void VipeViewFileHeader.set_number_of_symbols(&self, uint v)
-    => self.raw.number_of_symbols = v;
+macro uint VipeViewFileHeader.number_of_symbols(&self, uint v = ...)
+    => common::@exchange(self.raw.number_of_symbols, v);
 
-fn ushort VipeViewFileHeader.get_size_of_optional_header(&self)
-    => self.raw.size_of_optional_header;
-fn void VipeViewFileHeader.set_size_of_optional_header(&self, ushort v)
-    => self.raw.size_of_optional_header = v;
+macro ushort VipeViewFileHeader.size_of_optional_header(&self, ushort v = ...)
+    => common::@exchange(self.raw.size_of_optional_header, v);
 
-fn ushort VipeViewFileHeader.get_characteristics(&self)
-    => self.raw.characteristics;
-fn void VipeViewFileHeader.set_characteristics(&self, ushort v)
-    => self.raw.characteristics = v;
+macro ushort VipeViewFileHeader.characteristics(&self, ushort v = ...)
+    => common::@exchange(self.raw.characteristics, v);

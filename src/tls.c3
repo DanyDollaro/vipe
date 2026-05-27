@@ -39,53 +39,31 @@ struct VipeViewTlsDirectory
     }
 }
 
-fn ulong VipeViewTlsDirectory.get_raw_data_start_va(&self)
-    => self.is64 ? self.tls64.raw_data_start_va : (ulong)self.tls32.raw_data_start_va;
-fn void VipeViewTlsDirectory.set_raw_data_start_va(&self, ulong v)
-{
-    if (self.is64) { self.tls64.raw_data_start_va = v; }
-    else           { self.tls32.raw_data_start_va = (uint)v; }
-}
+macro ulong VipeViewTlsDirectory.raw_data_start_va(&self, ulong v = ...)
+    => self.is64
+        ? common::@exchange(self.tls64.raw_data_start_va, v)
+        : common::@exchange(self.tls32.raw_data_start_va, (uint)v);
 
-fn ulong VipeViewTlsDirectory.get_raw_data_end_va(&self)
-    => self.is64 ? self.tls64.raw_data_end_va : (ulong)self.tls32.raw_data_end_va;
-fn void VipeViewTlsDirectory.set_raw_data_end_va(&self, ulong v)
-{
-    if (self.is64) { self.tls64.raw_data_end_va = v; }
-    else           { self.tls32.raw_data_end_va = (uint)v; }
-}
+macro ulong VipeViewTlsDirectory.raw_data_end_va(&self, ulong v = ...)
+    => self.is64
+        ? common::@exchange(self.tls64.raw_data_end_va, v)
+        : common::@exchange(self.tls32.raw_data_end_va, (uint)v);
 
-fn ulong VipeViewTlsDirectory.get_address_of_index(&self)
-    => self.is64 ? self.tls64.address_of_index : (ulong)self.tls32.address_of_index;
-fn void VipeViewTlsDirectory.set_address_of_index(&self, ulong v)
-{
-    if (self.is64) { self.tls64.address_of_index = v; }
-    else           { self.tls32.address_of_index = (uint)v; }
-}
+macro ulong VipeViewTlsDirectory.address_of_index(&self, ulong v = ...)
+    => self.is64
+        ? common::@exchange(self.tls64.address_of_index, v)
+        : common::@exchange(self.tls32.address_of_index, (uint)v);
 
-fn ulong VipeViewTlsDirectory.get_address_of_callbacks(&self)
-    => self.is64 ? self.tls64.address_of_callbacks : (ulong)self.tls32.address_of_callbacks;
-fn void VipeViewTlsDirectory.set_address_of_callbacks(&self, ulong v)
-{
-    if (self.is64) { self.tls64.address_of_callbacks = v; }
-    else           { self.tls32.address_of_callbacks = (uint)v; }
-}
+macro ulong VipeViewTlsDirectory.address_of_callbacks(&self, ulong v = ...)
+    => self.is64
+        ? common::@exchange(self.tls64.address_of_callbacks, v)
+        : common::@exchange(self.tls32.address_of_callbacks, (uint)v);
 
-fn uint VipeViewTlsDirectory.get_size_of_zero_fill(&self)
-    => self.is64 ? self.tls64.size_of_zero_fill : self.tls32.size_of_zero_fill;
-fn void VipeViewTlsDirectory.set_size_of_zero_fill(&self, uint v)
-{
-    if (self.is64) { self.tls64.size_of_zero_fill = v; }
-    else           { self.tls32.size_of_zero_fill = v; }
-}
+macro uint VipeViewTlsDirectory.size_of_zero_fill(&self, uint v = ...)
+    => common::@select_exchange(self.is64, self.tls64.size_of_zero_fill, self.tls32.size_of_zero_fill, v);
 
-fn uint VipeViewTlsDirectory.get_characteristics(&self)
-    => self.is64 ? self.tls64.characteristics : self.tls32.characteristics;
-fn void VipeViewTlsDirectory.set_characteristics(&self, uint v)
-{
-    if (self.is64) { self.tls64.characteristics = v; }
-    else           { self.tls32.characteristics = v; }
-}
+macro uint VipeViewTlsDirectory.characteristics(&self, uint v = ...)
+    => common::@select_exchange(self.is64, self.tls64.characteristics, self.tls32.characteristics, v);
 
 //
 // Callbacks

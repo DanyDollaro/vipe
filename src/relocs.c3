@@ -49,9 +49,12 @@ struct VipeViewRelocation
     ushort offset;
 }
 
-fn uint VipeViewRelocation.get_rva(&self)    => self.rva;
-fn ushort VipeViewRelocation.get_type(&self)   => self.type;
-fn ushort VipeViewRelocation.get_offset(&self) => self.offset;
+macro uint VipeViewRelocation.rva(&self)
+    => self.rva;
+macro ushort VipeViewRelocation.type(&self)
+    => self.type;
+macro ushort VipeViewRelocation.offset(&self)
+    => self.offset;
 
 //
 // Callbacks

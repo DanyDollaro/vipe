@@ -55,17 +55,18 @@ fn void? VipeViewPe.set(&self, char[] buffer)
     VipeRawFileHeader* file_header = common::extract_struct(VipeRawFileHeader, buffer[offset..])!;
     offset += VipeRawFileHeader::size;
 
-    ushort* optional_header_magic = common::extract_struct(ushort, buffer[offset..])!;
-    VipeViewNtHeaders nt;
+    ushort* optional_header_magic =
+        common::extract_struct(ushort, buffer[offset..])!;
+    VipeViewNtHeaders nt_headers;
     switch (*optional_header_magic)
     {
         case optional::PE32_MAGIC:
-            nt = {
+            nt_headers = {
                 .is64 = false,
                 .h32 = common::extract_struct(VipeRawNtHeaders32, buffer[nt_base..])!
             };
         case optional::PE32PLUS_MAGIC:
-            nt = {
+            nt_headers = {
                 .is64 = true,
                 .h64 = common::extract_struct(VipeRawNtHeaders64, buffer[nt_base..])!
             };
@@ -78,13 +79,13 @@ fn void? VipeViewPe.set(&self, char[] buffer)
     VipeRawSectionHeader[] sections_headers;
     if (try v = common::extract_struct(VipeRawSectionHeader, buffer[offset..]))
     {
-        sections_headers = v[0 .. file_header.number_of_sections - 1];
+        sections_headers = v[0 : file_header.number_of_sections];
     }
 
     *self = {
         .buffer           = buffer,
         .dos              = { .raw = dos_header },
-        .nt               = nt,
+        .nt               = nt_headers,
         .sections_headers = sections_headers,
     };
 }
@@ -93,7 +94,7 @@ fn uint? VipeViewPe.rva_to_offset(&self, uint rva)
 {
     uint size_of_headers = self
         .optional_header()
-        .get_size_of_headers();
+        .size_of_headers();
 
     if (rva < size_of_headers)
     {
@@ -116,7 +117,7 @@ fn usz? VipeViewPe.offset_to_rva(&self, usz offset)
 {
     ulong size_of_headers = self
         .optional_header()
-        .get_size_of_headers();
+        .size_of_headers();
 
     if (offset < size_of_headers)
     {
@@ -173,7 +174,7 @@ fn void VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any user
     }
 }
 
-fn void? VipeViewPe.foreach_import_descriptor(&self, VipeImportDescriptorCallback callback, any user_data)
+fn void? VipeViewPe.foreach_import_descriptor(&self, VipeCallbackImportDescriptor callback, any user_data)
 {
     VipeRawDataDirectory* import_directory =
         self.get_raw_data_directory(VipeDataDirectoryIndex.IMPORT)!;
@@ -185,16 +186,16 @@ fn void? VipeViewPe.foreach_import_descriptor(&self, VipeImportDescriptorCallbac
         VipeRawImportDescriptor* r =
             common::extract_struct(VipeRawImportDescriptor, self.buffer[offset..])!;
 
-        if (*r = (VipeRawImportDescriptor){})
+        if (common::is_zero_struct(&r, VipeRawImportDescriptor::size))
         {
             break;
         }
 
-        ZString dll = (ZString)&self.buffer[self.rva_to_offset(r.name_rva)!];
+        ZString name = (ZString)&self.buffer[self.rva_to_offset(r.name_rva)!];
 
         VipeViewImportDescriptor desc = {
             .raw = r,
-            .dll = dll
+            .name = name
         };
 
         if (!callback(&desc, user_data))
@@ -274,7 +275,6 @@ fn VipeViewCor20Header? VipeViewPe.cor20_header(&self)
 
     usz offset = self.rva_to_offset(clr_directory.virtual_address)!;
 
-    return {
-        .raw = common::extract_struct(VipeRawCor20Header, &self.buffer[offset..])
-    };
+    // TODO: finish this function
+    return { };
 }

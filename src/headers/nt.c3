@@ -52,19 +52,8 @@ fn void VipeViewNtHeaders.set(&self, bool is64, void* nt_headers)
     }
 }
 
-fn uint VipeViewNtHeaders.get_signature(&self)
-    => self.is64 ? self.h64.signature : self.h32.signature;
-fn void VipeViewNtHeaders.set_signature(&self, uint v)
-{
-    if (self.is64)
-    {
-        self.h64.signature = v;
-    }
-    else
-    {
-        self.h32.signature = v;
-    }
-}
+macro uint VipeViewNtHeaders.signature(&self, uint v = ...)
+    => common::@select_exchange(self.is64, self.h64.signature, self.h32.signature, v);
 
 fn VipeViewFileHeader VipeViewNtHeaders.file_header(&self)
 {
