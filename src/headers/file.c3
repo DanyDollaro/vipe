@@ -1,7 +1,7 @@
 module vipe::headers::file;
 import vipe::common;
 
-constdef VipeMachineType
+constdef VipeMachineType : ushort
 {
     UNKNOWN = 0x0000,
     I386    = 0x014C,
