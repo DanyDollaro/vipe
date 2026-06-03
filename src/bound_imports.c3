@@ -45,4 +45,4 @@ macro ushort  VipeViewBoundImport.number_of_module_forwarder_refs(&self)
 // Callbacks
 //
 
-alias VipeCallbackBoundImport = fn void?(VipeViewBoundImportDescriptor*, any);
+alias VipeCallbackBoundImport = fn void?(VipeViewBoundImportDescriptor* entry, any user_data = null);

@@ -63,5 +63,5 @@ macro uint    VipeViewDelayedImport.iat_entry_rva(&self) => self.iat_entry_rva;
 // Callbacks
 //
 
-alias VipeCallbackDelayedImportDescriptor = fn void?(VipeViewDelayedImportDescriptor*, any);
-alias VipeCallbackDelayedImport           = fn void?(VipeViewDelayedImport*, any);
+alias VipeCallbackDelayedImportDescriptor = fn void?(VipeViewDelayedImportDescriptor* entry, any user_data = null);
+alias VipeCallbackDelayedImport           = fn void?(VipeViewDelayedImport* entry, any user_data = null);

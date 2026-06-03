@@ -66,20 +66,21 @@ struct VipeViewImport
         VipeRawThunkData32* thunk32;
         VipeRawThunkData64* thunk64;
     }
-    sz thunk_index;
+    // index into the array of thunks
+    sz index;
     VipeRawImportByName* import_by_name;
 }
 
 macro ZString VipeViewImport.name(&self) => self.name;
-macro ushort  VipeViewImport.hint(&self) => self.hint;
-macro ushort  VipeViewImport.ordinal(&self) => self.ordinal;
-macro bool    VipeViewImport.is_ordinal(&self) => self.is_ordinal;
-macro uint    VipeViewImport.iat_entry_rva(&self, uint v = ...)
+macro ushort VipeViewImport.hint(&self) => self.hint;
+macro ushort VipeViewImport.ordinal(&self) => self.ordinal;
+macro bool VipeViewImport.is_ordinal(&self) => self.is_ordinal;
+macro uint VipeViewImport.iat_entry_rva(&self, uint v = ...)
     => common::@exchange(self.iat_entry_rva, v);
 
 //
 // Callbacks
 //
 
-alias VipeCallbackImportDescriptor = fn void?(VipeViewImportDescriptor*, any);
-alias VipeCallbackImport = fn void?(VipeViewImport*, any);
+alias VipeCallbackImportDescriptor = fn void?(VipeViewImportDescriptor* entry, any user_data = null);
+alias VipeCallbackImport = fn void?(VipeViewImport* entry, any user_data = null);

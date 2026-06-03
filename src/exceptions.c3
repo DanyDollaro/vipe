@@ -114,8 +114,8 @@ macro uint VipeExceptionArm.packed_unwind(&self, uint v = ...)
 // Callbacks
 //
 
-alias VipeCallbackExceptionX64 = fn void?(VipeExceptionX64*, any);
-alias VipeCallbackExceptionArm = fn void?(VipeExceptionArm*, any);
+alias VipeCallbackExceptionX64 = fn void?(VipeExceptionX64* entry, any user_data = null);
+alias VipeCallbackExceptionArm = fn void?(VipeExceptionArm* entry, any user_data = null);
 
 //
 // Parsing

@@ -158,7 +158,7 @@ fn VipeRawDataDirectory*? VipeViewPe.get_raw_data_directory(&self, VipeDataDirec
         : common::MISSING_RESOURCE~;
 }
 
-fn void? VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any user_data)
+fn void? VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any user_data = null)
 {
     foreach (&s : self.sections_headers)
     {
@@ -171,7 +171,7 @@ fn void? VipeViewPe.foreach_section(&self, VipeCallbackSection callback, any use
     }
 }
 
-fn void? VipeViewPe.foreach_import_descriptor(&self, VipeCallbackImportDescriptor callback, any user_data)
+fn void? VipeViewPe.foreach_import_descriptor(&self, VipeCallbackImportDescriptor callback, any user_data = null)
 {
     VipeRawDataDirectory* import_directory =
         self.get_raw_data_directory(VipeDataDirectoryIndex.IMPORT)!;

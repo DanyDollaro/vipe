@@ -94,4 +94,4 @@ macro uint VipeViewResource.language_id(&self)
 // Callbacks
 //
 
-alias VipeCallbackResource = fn void?(VipeViewResource*, any);
+alias VipeCallbackResource = fn void?(VipeViewResource* entry, any user_data = null);

@@ -66,7 +66,7 @@ struct VipeViewDebugDirectory
     VipeRawDebugDirectory[] entries;
 }
 
-fn void? VipeViewDebugDirectory.foreach_debug_entry(&self, char[][] data_slices, VipeCallbackDebug callback, any user_data)
+fn void? VipeViewDebugDirectory.foreach_debug_entry(&self, char[][] data_slices, VipeCallbackDebug callback, any user_data = null)
 {
     for (usz i = 0; i < self.entries.len; i++)
     {
@@ -82,4 +82,4 @@ fn void? VipeViewDebugDirectory.foreach_debug_entry(&self, char[][] data_slices,
 // Callbacks
 //
 
-alias VipeCallbackDebug = fn void?(VipeViewDebug*, any);
+alias VipeCallbackDebug = fn void?(VipeViewDebug* entry, any user_data = null);

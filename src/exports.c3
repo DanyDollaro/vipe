@@ -79,4 +79,4 @@ macro ZString VipeViewExport.forwarder(&self, ZString v = ...)
 // Callbacks
 //
 
-alias VipeCallbackExport = fn void?(VipeViewExport*, any);
+alias VipeCallbackExport = fn void?(VipeViewExport* entry, any user_data = null);
